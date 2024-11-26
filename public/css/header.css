@@ -1,4 +1,6 @@
-header {
+.header {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 20px;
     height: auto;
     overflow: hidden;
     position: relative;
