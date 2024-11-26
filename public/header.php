@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>WEB</title>
+    <link rel="stylesheet" href="/organizer/public/css/header.css">
 </head>
 <body>
-    <h1>ORGANIZER</h1>
-    <ul>
-        <a href="about.php"><li>123</li></a>
-        <a href="index.php"><li>456</li></a>
-    </ul>
+    <div class="header">
+        <h1>ORGANIZER</h1>
+        <p>Main</p>
+        <p>Notes</p>
+        <p>About</p>
+    </div>
 </body>
 </html>

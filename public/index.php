@@ -7,7 +7,7 @@
 </head>
 <body>
 <?php
-        require('thing.php')
+        require('header.php')
     ?>
     <h1>Main</h1>
 </body>
