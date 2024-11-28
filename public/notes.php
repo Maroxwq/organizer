@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Page</title>
+    <title>Notes</title>
 </head>
 <body>
     <?php require('header.php')?>
-    <h1>About</h1>
+    <h1>Notes</h1>
 </body>
 </html>
-

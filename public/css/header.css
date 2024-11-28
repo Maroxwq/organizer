@@ -1,7 +1,102 @@
+body{
+    padding: 0px 50px;
+    text-decoration: none;
+    font-family: "Inter", serif;
+}
+a {
+    text-decoration: none;
+    color: black;
+}
+button {
+    text-align: center;
+    cursor: pointer;
+    border-style: none;
+    border-radius: 7px;
+}
 .header {
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-size: 20px;
-    height: auto;
-    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+}
+.section {
+    display: flex;
+    align-items: center;
+}
+.hbutton {
+    font-size: 19px;
+    padding: 0px 40px;
+}
+.logo {
+    font-size: 50px;
+    padding: 0px 0px;
+    font-weight: bold;
+}
+.login {
+    color: white;
+    text-align: center;
+}
+.section button {
+    text-decoration: none;
     position: relative;
+    height: 40%;
+    background-color: black;
+}
+.mainun, .notesun, .aboutun {
+    text-decoration: underline;
+}
+.info {
+    width: 37%;
+}
+.info h1 {
+    font-size: 70px;
+    font-weight: 750;
+}
+.info p {
+    font-size: 25px;
+    color: #000000BF;
+}
+.info button {
+    font-size: 25px;
+    background-color: black;
+    color: white;
+    width: 18%;
+    min-height: 71px;
+}
+.content h2 {
+    width: 100%;
+    font-size: 60px;
+    font-weight: 600;
+}
+.subheading {
+    margin-top: -1.5%;
+    margin-left: 0.6%;
+    width: 20%;
+}
+.titl {
+    font-size: 32px;
+    font-weight: 500;
+    margin-top: 11%;
+}
+.txt {
+    color: #000000BF;
+    font-size: 24px;
+    margin-top: -5%;
+}
+.btns {
+    width: 50%;
+    margin-top: 2%;
+}
+.btn1 {
+    font-size: 25px;
+    background-color: black;
+    color: white;
+    width: 11%;
+    min-height: 58px;
+}
+.btn2 {
+    margin-left: 3.7%;
+    font-size: 25px;
+    background-color: rgba(158, 158, 158, 0.382);
+    color: black;
+    width: 22%;
+    min-height: 58px;
 }
