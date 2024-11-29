@@ -8,7 +8,7 @@
 <body>
     <?php require('header.php')?>
 
-    <div class="content">
+    <div class="content1">
         <div class="info">
             <h1>Main page</h1>
             <p>Subheading that sets up context, shares more info about the website, or generally gets people psyched to keep scrolling.</p>
