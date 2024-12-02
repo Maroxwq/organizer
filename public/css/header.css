@@ -46,6 +46,8 @@ h1 {
 }
 .mainun, .notesun, .aboutun {
     text-decoration: underline;
+    text-underline-offset: 2.5px;
+    font-weight: 500;
 }
 .info {
     width: 37%;
