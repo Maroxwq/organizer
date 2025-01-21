@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Org\Contoller;
+namespace Org\Controller;
 
 class AboutController
 {
     public function index()
     {
-        echo 'ok', PHP_EOL;
+        echo 'about controller response', PHP_EOL;
     }
 }

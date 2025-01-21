@@ -173,3 +173,9 @@ h3 {
     margin-top: 50px;
     border-radius: 7px;
 }
+
+.ads {
+    border: 2px solid gray;
+    width: 100px;
+    height: 300px;
+}
