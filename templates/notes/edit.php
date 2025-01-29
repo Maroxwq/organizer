@@ -1,19 +1,26 @@
 <div class="errors">
     <ul>
-        <?php foreach ($errors as $error): ?>
-            <li class="error"><?= htmlspecialchars($error) ?></li>
+        <?php foreach ($errors as $fieldErrors): ?>
+            <?php foreach ($fieldErrors as $error): ?>
+                <li class="text-danger"><?= $error ?></li>
+            <?php endforeach; ?>
         <?php endforeach; ?>
     </ul>
 </div>
-<form method="POST" action="/notes/update">
-    <input type="hidden" name="id" value="<?= $note->getId() ?>">
-    <div>
-        <label for="content">Контент:</label>
-        <textarea id="content" name="content"><?= $note->getContent() ?></textarea>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
+    <div class="card shadow-lg p-4 rounded" style="width: 400px;">
+        <h2 class="text-center mb-4">Редактировать заметку</h2>
+        <form method="POST" action="/notes/update">
+            <input type="hidden" name="id" value="<?= $note->getId() ?>">
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="content" name="content" placeholder="Введите текст" style="height: 100px;"><?= $note->getContent() ?></textarea>
+                <label for="content">Контент</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="color" class="form-control" id="color" name="color" value="<?= $note->getColor() ?>" style="height: 58px;">
+                <label for="color">Цвет</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+        </form>
     </div>
-    <div>
-        <label for="color">Цвет:</label>
-        <input type="color" id="color" name="color" value="<?= $note->getColor() ?>">
-    </div>
-    <button type="submit">Сохранить</button>
-</form>
+</div>

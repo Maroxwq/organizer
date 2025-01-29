@@ -20,7 +20,7 @@ class Note
     {
         return [
             ['content' => ['required' => true]],
-            ['content' => ['string' => ['maxLenght' => 255]]],
+            ['content' => ['string' => ['maxLength' => 255]]],
             ['color' => ['regex' => '/^#[A-Fa-f0-9]{1,6}$/']],
         ];
     }

@@ -2,10 +2,18 @@
 
 namespace Org\Controller;
 
-class AboutController
+use Org\Core\BaseController;
+
+class AboutController extends BaseController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->view()->setLayout('layout');
+    }
+
     public function index()
     {
-        echo 'about controller response', PHP_EOL;
+        return $this->view()->render('about/index');
     }
 }

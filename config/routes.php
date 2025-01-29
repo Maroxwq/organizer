@@ -9,4 +9,5 @@ return [
     '/notes/update' => 'notes/update',
     '/notes/delete' => 'notes/delete',
     '/notes/:id' => 'notes/view',
+    '/draft' => 'draft/index'
 ];

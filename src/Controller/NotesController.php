@@ -3,6 +3,7 @@
 namespace Org\Controller;
 
 use Org\Core\BaseController;
+use Org\Core\Validator\ModelValidator;
 use Org\Core\View;
 use Org\Repository\NoteRepository;
 
@@ -33,24 +34,14 @@ class NotesController extends BaseController
     {
         $content = $_POST['content'];
         $color = $_POST['color'];
-        $errors = [];
 
-        if (strlen($content) > 256) {
-            $errors[] = 'контент слишком длинный';
-        }
-
-        if (strlen($color) > 50) {
-            $errors[] = 'цвет слишком длинный';
-        } elseif (!preg_match('/^#[A-Fa-f0-9]{1,6}$/', $color)) {
-            $errors[] = 'цвет должен выглядеть так #000000';
-        }
-
-        if (!empty($errors)) {
-            return $this->view()->render('notes/add', ['errors' => $errors, 'content' => htmlspecialchars($content), 'color' => htmlspecialchars($color)]);
-        }
-
-        $repository = new \Org\Repository\NoteRepository();
         $note = new \Org\Model\Note(htmlspecialchars($content), htmlspecialchars($color));
+        $validator = new ModelValidator();
+        $errors = $validator->validate($note);
+        if (!empty($errors)) {
+            return $this->view()->render('notes/add', ['errors' => $errors, 'content' => $content, 'color' => $color]);
+        }
+        $repository = new \Org\Repository\NoteRepository();
         $repository->addNew($note);
         header('Location: /notes');
     }
@@ -68,26 +59,15 @@ class NotesController extends BaseController
         $id = $_POST['id'];
         $content = $_POST['content'];
         $color = $_POST['color'];
-        $errors = [];
-
-        if (strlen($content) > 256) {
-            $errors[] = 'контент слишком длинный';
-        }
-
-        if (strlen($color) > 50) {
-            $errors[] = 'цвет слишком длинный';
-        } elseif (!preg_match('/^#[A-Fa-f0-9]{1,6}$/', $color)) {
-            $errors[] = "цвет должен выглядеть так: #000000";
-        }
-        
-        if (!empty($errors)) {
-            $note = $this->repository->getById((int)$id);
-            return $this->view()->render('notes/edit', ['errors' => $errors,'note' => $note]);
-        }
 
         $note = $this->repository->getById((int)$id);
         $note->changeContent(htmlspecialchars($content));
         $note->changeColor(htmlspecialchars($color));
+        $validator = new ModelValidator();
+        $errors = $validator->validate($note);
+        if (!empty($errors)) {
+            return $this->view()->render('notes/edit', ['errors' => $errors, 'note' => $note]);
+        }
         $this->repository->updateNote($note);
         header('Location: /notes');
     }

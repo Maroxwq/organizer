@@ -10833,5 +10833,11 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.myowncard {
+  transition: .3s;
+}
+.myowncard:hover {
+  transform:scale(1.1);
+}
 
 /*# sourceMappingURL=bootstrap.css.map */

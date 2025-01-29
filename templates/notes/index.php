@@ -6,14 +6,17 @@ use Org\Core\View;
 $this->extends('layout');
 ?>
 
-<a href="/notes/add" class="button">добавить заметку</a>
-<div class="container d-flex flex-wrap">
+<div class="text-center">
+    <a href="/notes/add" class="btn btn-primary btn-lg mb-3 mt-4">Добавить заметку</a>
+</div>
+<div class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
-    <div class="note w-25 card m-3 shadow rounded" style="background-color: <?= htmlspecialchars($note->getColor()) ?>; ">
+    <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">
         <div class="card-body">
             <h1><?= $note->getContent() ?></h1>
-            <p class="colorstr">цвет: <?= $note->getColor() ?></p>
-            <p class="datechangedstr">дата изменения: <?= $note->getDateChanged() ?></p> <br>
+            <p class="colorstr">Цвет: <?= $note->getColor() ?></p>
+            <p class="datechangedstr">Дата изменения: <?= $note->getDateChanged() ?></p> <br>
+            <div class="d-flex justify-content-between">
             <form method="POST" action="/notes/delete" class="forms">
                 <input type="hidden" name="id" value="<?= $note->getId() ?>">
                 <button type="submit" class="btn btn-danger">Удалить</button>
@@ -22,6 +25,7 @@ $this->extends('layout');
                 <input type="hidden" name="id" value="<?= $note->getId() ?>">
                 <button type="submit" class="btn btn-primary">Изменить</button>
             </form>
+            </div>
         </div>
     </div>
 <?php } ?>
