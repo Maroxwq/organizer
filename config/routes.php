@@ -8,6 +8,7 @@ return [
     '/notes/edit' => 'notes/edit',
     '/notes/update' => 'notes/update',
     '/notes/delete' => 'notes/delete',
-    '/notes/:id' => 'notes/view',
-    '/draft' => 'draft/index'
+    '/notes/:id' => 'notes/viewNote',
+    '/notes/:id/:order' => 'notes/viewNote',
+    '/draft' => 'draft/index',
 ];

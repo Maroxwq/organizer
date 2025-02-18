@@ -8,21 +8,12 @@ class App
     {
         try {
             $routes = include __DIR__ . '/../../config/routes.php';
+            $router = new Router($routes);
+            $routeInfo = $router->detect($_SERVER['REQUEST_URI']);
 
-            $uri = $_SERVER['REQUEST_URI'];
-            if (!isset($routes[$uri])) {
-                throw new \RuntimeException('Route not found for URI: ' . $uri);
-            }
-
-            $parts = explode('/', $routes[$uri]);
-    
-            $methodName = $parts[1];
-            $className = '\\Org\\Controller\\' . ucfirst($parts[0]) . 'Controller';
-    
-            $controller = new $className();
-            echo $controller->$methodName();
+            echo (new $routeInfo['controllerClassName']())->{$routeInfo['methodName']}($routeInfo['params']);
         } catch (\Throwable $exception) {
-            echo '<h1>', $exception->getMessage(), '</h1>', '<br>';
+            echo '<h1>', $exception->getMessage(), '</h1>';
             echo nl2br($exception->getTraceAsString()), '<br>';
         }
     }

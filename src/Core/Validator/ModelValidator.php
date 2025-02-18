@@ -2,44 +2,42 @@
 
 namespace Org\Core\Validator;
 
+use Org\Core\Validator\ValidatorFactory;
+
 class ModelValidator
 {
-    public function validate($model)
+    public function validate($model): array
     {
         $rules = $model->validationRules();
+        $factory = new ValidatorFactory();
         $errors = [];
 
-    //     foreach ($rules as $fieldRule) {
-    //         foreach ($fieldRule as $field => $rule) {
-    //             $getterName 
-    //         }
-    //     }
+        foreach ($rules as $ruleList) {
+            foreach ($ruleList as $field => $validations) {
+                $getter = 'get' . ucfirst($field);
 
-        foreach ($rules as $rule) {
-            foreach ($rule as $field => $validations) {
-                $value = null;
-                if ($field === 'content') {
-                    $value = $model->getContent();
-                } elseif ($field === 'color') {
-                    $value = $model->getColor();
+                if (!method_exists($model, $getter)) {
+                    throw new \RuntimeException('Method does not exist ' . $getter);
                 }
-                foreach ($validations as $validation => $params) {
-                    if ($validation === 'required' && $params === true && empty($value)) {
-                        $errors[$field][] = "Поле контент не может быть пустым";
+
+                $value = $model->$getter();
+
+                foreach ($validations as $type => $options) {
+                    $validator = $factory->create($type);
+
+                    if (!is_array($options)) {
+                        $options = [];
                     }
 
-                    if ($validation === 'string' && isset($params['maxLength'])) {
-                        if (!is_string($value)) {
-                            $errors[$field][] = "Поле контент должно быть строкой";
-                        } elseif (strlen($value) > $params['maxLength']) {
-                            $errors[$field][] = "Поле контент не может быть длинне 255 символов";
-                        }
+                    $result = $validator->validate($value, $options);
+
+                    if ($result !== true) {
+                        $errors[$field] = array_merge($errors[$field] ?? [], (array)$result);
                     }
                 }
             }
         }
-    
+
         return $errors;
     }
-    
 }

@@ -12,6 +12,7 @@ $this->extends('layout');
 <div class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
     <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">
+    <a href="/notes/<?= $note->getId() ?>" class="text-decoration-none text-dark">
         <div class="card-body">
             <h1><?= $note->getContent() ?></h1>
             <p class="colorstr">Цвет: <?= $note->getColor() ?></p>
@@ -27,6 +28,7 @@ $this->extends('layout');
             </form>
             </div>
         </div>
+    </a>
     </div>
 <?php } ?>
 </div>

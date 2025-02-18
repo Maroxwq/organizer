@@ -21,7 +21,7 @@ class Note
         return [
             ['content' => ['required' => true]],
             ['content' => ['string' => ['maxLength' => 255]]],
-            ['color' => ['regex' => '/^#[A-Fa-f0-9]{1,6}$/']],
+            ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
     }
 

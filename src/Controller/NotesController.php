@@ -78,4 +78,18 @@ class NotesController extends BaseController
         $this->repository->deleteNote((int)$id);
         header('Location: /notes');
     }
+
+    public function viewNote(array $params)
+    {
+        print_r($params);
+        $id = (int) $params['id'];
+        $repository = new NoteRepository();
+        $note = $repository->getById($id);
+
+        if ($note === null) {
+            throw new \RuntimeException('Note not found for ID: ' . $id);
+        }
+
+        return $this->view()->render('notes/view', ['note' => $note]);
+    }
 }

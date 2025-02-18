@@ -7,7 +7,7 @@ class RequiredValidator implements ValidatorInterface
     public function validate(mixed $value, array $options = []): true | array
     {
         if (empty($value)) {
-            $errors = ['Value is required'];
+            $errors = ['Поле не должно быть пустым'];
         }
 
         return $errors ?? true;
