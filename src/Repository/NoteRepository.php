@@ -43,6 +43,15 @@ class NoteRepository
         $stmt->execute([':content' => $note->getContent(), ':dateChanged' => $note->getDateChanged(), ':color' => $note->getColor(), ':id' => $note->getId()]);
     }
 
+    public function save(Note $note): void
+    {
+        if ($note->getId() === null) {
+            $this->addNew($note);
+        } else {
+            $this->updateNote($note);
+        }
+    }
+
     public function deleteNote(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM notes WHERE id = :id');

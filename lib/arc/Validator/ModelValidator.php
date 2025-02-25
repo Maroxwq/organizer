@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Org\Core\Validator;
+namespace Arc\Validator;
 
-use Org\Core\Validator\ValidatorFactory;
+use Arc\Validator\ValidatorFactory;
 
 class ModelValidator
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Org\Core\Validator;
+namespace Arc\Validator;
 
 class RegexValidator implements ValidatorInterface
 {

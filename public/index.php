@@ -1,9 +1,15 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__.'/../src/autoload.php';
+use Arc\Framework\App;
+use Arc\Framework\Autoloader;
 
-use Org\Core\App;
+require_once __DIR__ . '/../lib/arc/Framework/Autoloader.php';
 
-$app = new App();
+Autoloader::registerNamespaces([
+    'Arc\\' => realpath(__DIR__ . '/../lib/arc'),
+    'Org\\' => realpath(__DIR__ . '/../src'),
+]);
 
-$app->run();
+$config = require __DIR__ . '/../config/web.php';
+
+(new App($config))->run();

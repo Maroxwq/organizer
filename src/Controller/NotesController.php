@@ -2,10 +2,10 @@
 
 namespace Org\Controller;
 
-use Org\Core\BaseController;
-use Org\Core\Validator\ModelValidator;
-use Org\Core\View;
+use Arc\Framework\BaseController;
+use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
+use Org\Model\Note;
 
 class NotesController extends BaseController
 {
@@ -18,70 +18,34 @@ class NotesController extends BaseController
         $this->view()->setLayout('layout');
     }
 
-    public function index()
+    public function index(): string
     {
+        var_dump($_GET);
         $notes = $this->repository->findAll();
 
         return $this->view()->render('notes/index', ['notes' => $notes]);
     }
 
-    public function add()
+    public function add(): string
     {
-        return $this->view()->render('notes/add');
+        return $this->handleForm(new Note, 'add');
     }
 
-    public function save()
+    public function edit(array $params): string
     {
-        $content = $_POST['content'];
-        $color = $_POST['color'];
-
-        $note = new \Org\Model\Note(htmlspecialchars($content), htmlspecialchars($color));
-        $validator = new ModelValidator();
-        $errors = $validator->validate($note);
-        if (!empty($errors)) {
-            return $this->view()->render('notes/add', ['errors' => $errors, 'content' => $content, 'color' => $color]);
-        }
-        $repository = new \Org\Repository\NoteRepository();
-        $repository->addNew($note);
-        header('Location: /notes');
+        return $this->handleForm($this->repository->getById((int) $params['id']), 'edit');
     }
 
-    public function edit()
-    {
-        $id = $_POST['id'];
-        $note = $this->repository->getById((int)$id);
-    
-        return $this->view()->render('notes/edit', ['note' => $note]);
-    }
-
-    public function update()
-    {
-        $id = $_POST['id'];
-        $content = $_POST['content'];
-        $color = $_POST['color'];
-
-        $note = $this->repository->getById((int)$id);
-        $note->changeContent(htmlspecialchars($content));
-        $note->changeColor(htmlspecialchars($color));
-        $validator = new ModelValidator();
-        $errors = $validator->validate($note);
-        if (!empty($errors)) {
-            return $this->view()->render('notes/edit', ['errors' => $errors, 'note' => $note]);
-        }
-        $this->repository->updateNote($note);
-        header('Location: /notes');
-    }
-
-    public function delete()
+    public function delete(): string
     {
         $id = $_POST['id'];
         $this->repository->deleteNote((int)$id);
         header('Location: /notes');
+        return '';
     }
 
-    public function viewNote(array $params)
+    public function viewNote(array $params): string
     {
-        print_r($params);
         $id = (int) $params['id'];
         $repository = new NoteRepository();
         $note = $repository->getById($id);
@@ -90,6 +54,23 @@ class NotesController extends BaseController
             throw new \RuntimeException('Note not found for ID: ' . $id);
         }
 
-        return $this->view()->render('notes/view', ['note' => $note]);
+        return $this->view->render('notes/view', ['note' => $note]);
+    }
+
+    private function handleForm(Note $note, string $templateName): string
+    {
+        $errors = [];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
+            $note->load($_POST) &&
+            empty($errors = (new ModelValidator())->validate($note))
+        ) {
+            $this->repository->save($note);
+            header('Location: /notes');
+
+            return '';
+        }
+
+        return $this->view()->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Org\Controller;
 
-use Org\Core\BaseController;
+use Arc\Framework\BaseController;
 
 class AboutController extends BaseController
 {

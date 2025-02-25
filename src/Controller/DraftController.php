@@ -2,7 +2,7 @@
 
 namespace Org\Controller;
 
-use Org\Core\BaseController;
+use Arc\Framework\BaseController;
 use Org\Model\User;
 
 class DraftController extends BaseController

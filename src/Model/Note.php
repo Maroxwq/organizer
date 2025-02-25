@@ -4,13 +4,14 @@ namespace Org\Model;
 
 class Note
 {
-    private int $id;
+    private ?int $id;
     private string $content;
     private string $dateChanged;
     private string $color;
 
-    public function __construct(string $content, string $color)
+    public function __construct(string $content = '', string $color = '')
     {
+        $this->id = null;
         $this->content = $content;
         $this->color = $color;
         $this->dateChanged = date('Y-m-d H:i:s');
@@ -23,6 +24,14 @@ class Note
             ['content' => ['string' => ['maxLength' => 255]]],
             ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
+    }
+
+    public function load(array $data): bool
+    {
+        $this->changeContent($data['content']);
+        $this->changeColor($data['color']);
+
+        return true;
     }
 
     public function fromDbRow(array $dbRow): void
@@ -38,7 +47,7 @@ class Note
         return "$this->content, $this->dateChanged - $this->color";
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

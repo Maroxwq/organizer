@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Org\Core;
+namespace Arc\View;
 
 class View
 {
