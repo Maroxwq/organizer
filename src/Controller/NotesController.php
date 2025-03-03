@@ -6,24 +6,24 @@ use Arc\Framework\BaseController;
 use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
+use Arc\Http\Request;
+use Arc\View\View;
 
 class NotesController extends BaseController
 {
     private NoteRepository $repository;
 
-    public function __construct()
+    public function __construct(Request $request, View $view)
     {
-        parent::__construct();
+        parent::__construct($request, $view);
         $this->repository = new NoteRepository();
-        $this->view()->setLayout('layout');
+        $this->view->setLayout('layout');
     }
 
     public function index(): string
     {
-        var_dump($_GET);
         $notes = $this->repository->findAll();
-
-        return $this->view()->render('notes/index', ['notes' => $notes]);
+        return $this->view->render('notes/index', ['notes' => $notes]);
     }
 
     public function add(): string
@@ -33,22 +33,21 @@ class NotesController extends BaseController
 
     public function edit(array $params): string
     {
-        return $this->handleForm($this->repository->getById((int) $params['id']), 'edit');
+        $note = $this->repository->getById((int)$params['id']);
+        return $this->handleForm($note, 'edit');
     }
 
-    public function delete(): string
+    public function delete(array $params): string
     {
-        $id = $_POST['id'];
-        $this->repository->deleteNote((int)$id);
+        $this->repository->deleteNote((int) $params['id']);
         header('Location: /notes');
         return '';
     }
 
     public function viewNote(array $params): string
     {
-        $id = (int) $params['id'];
-        $repository = new NoteRepository();
-        $note = $repository->getById($id);
+        $id = (int)$params['id'];
+        $note = $this->repository->getById($id);
 
         if ($note === null) {
             throw new \RuntimeException('Note not found for ID: ' . $id);
@@ -60,17 +59,16 @@ class NotesController extends BaseController
     private function handleForm(Note $note, string $templateName): string
     {
         $errors = [];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
-            $note->load($_POST) &&
-            empty($errors = (new ModelValidator())->validate($note))
-        ) {
-            $this->repository->save($note);
-            header('Location: /notes');
-
-            return '';
+        $post = $this->request->getPost();
+        if ($this->request->isPost() && isset($post['content'], $post['color'])) {
+            if ($note->load($post) && empty($errors = (new ModelValidator())->validate($note))) {
+                $this->repository->save($note);
+                header('Location: /notes');
+                return '';
+            }
         }
-
-        return $this->view()->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
+    
+        return $this->view->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
     }
+    
 }

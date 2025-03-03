@@ -10,13 +10,9 @@ class BaseController
     protected View $view;
     protected Request $request;
 
-    public function __construct()
+    public function __construct(Request $request, View $view)
     {
-        $this->view = new View(__DIR__ . '/../../../templates/');
-    }
-
-    public function view(): View
-    {
-        return $this->view;
+        $this->request = $request;
+        $this->view = $view;
     }
 }

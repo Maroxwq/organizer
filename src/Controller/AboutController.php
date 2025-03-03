@@ -6,14 +6,14 @@ use Arc\Framework\BaseController;
 
 class AboutController extends BaseController
 {
-    public function __construct()
+    public function __construct(\Arc\Http\Request $request, \Arc\View\View $view)
     {
-        parent::__construct();
-        $this->view()->setLayout('layout');
+        parent::__construct($request, $view);
+        $this->view->setLayout('layout');
     }
 
     public function index()
     {
-        return $this->view()->render('about/index');
+        return $this->view->render('about/index');
     }
 }

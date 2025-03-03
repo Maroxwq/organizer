@@ -12,7 +12,7 @@
         <h2 class="text-center mb-4">Редактировать заметку</h2>
         <form method="POST" action="/notes/edit/<?= $note->getId() ?>">
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="content" name="content" placeholder="Введите текст" style="height: 100px;"><?= $note->getContent() ?></textarea>
+                <textarea class="form-control" id="content" name="content" placeholder="Введите текст" style="height: 100px;"><?= htmlspecialchars($note->getContent()) ?></textarea>
                 <label for="content">Контент</label>
             </div>
             <div class="form-floating mb-3">

@@ -10,7 +10,7 @@ class DraftController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->view()->setLayout('layout');
+        $this->view->setLayout('layout');
     }
 
     public function index()
@@ -18,6 +18,6 @@ class DraftController extends BaseController
         $user = new User('', '', 0);
         $user->load($_POST);
 
-        return $this->view()->render('draft/index');
+        return $this->view->render('draft/index');
     }
 }

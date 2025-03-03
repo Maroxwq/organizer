@@ -2,21 +2,27 @@
 
 namespace Arc\Router;
 
+use Arc\Framework\Config;
+
 class Router
 {
     private array $routes;
+    private Config $config;
 
-    public function __construct(array $routes)
+    public function __construct(array $routes, Config $config)
     {
         $this->routes = $routes;
+        $this->config = $config;
     }
 
     public function detect(string $requestUri): array
     {
+        $uri = parse_url($requestUri, PHP_URL_PATH);
+
         foreach ($this->routes as $route => $action) {
             $pattern = preg_replace('/:\w+/', '(\w+)', $route) . '/?';
             
-            if (preg_match('#^' . $pattern . '$#', $requestUri, $matches)) {
+            if (preg_match('#^' . $pattern . '$#', $uri, $matches)) {
                 $parts = explode('/', $action);
                 $params = [];
 
@@ -26,13 +32,13 @@ class Router
                 }
 
                 return [
-                    'controllerClassName' => '\\Org\\Controller\\' . ucfirst($parts[0]) . 'Controller',
+                    'controllerClassName' => $this->config->namespacePrefix() . 'Controller\\' . ucfirst($parts[0]) . 'Controller',
                     'methodName' => $parts[1],
                     'params' => $params
                 ];
             }
         }
 
-        throw new \RuntimeException('Route not found: ' . $requestUri);
+        throw new \RuntimeException('Route not found: ' . $uri);
     }
 }

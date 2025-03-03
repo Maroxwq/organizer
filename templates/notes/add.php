@@ -12,7 +12,7 @@
         <h2 class="text-center mb-4">Добавить заметку</h2>
         <form action="/notes/add" method="post">
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="content" name="content" value="<?= $note->getContent() ?>" placeholder="Введите текст">
+                <input type="text" class="form-control" id="content" name="content" value="<?= htmlspecialchars($note->getContent()) ?>" placeholder="Введите текст">
                 <label for="content">Текст</label>
             </div>
             <div class="form-floating mb-3">
