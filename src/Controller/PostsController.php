@@ -2,14 +2,14 @@
 
 namespace Org\Controller;
 
-use Arc\Framework\BaseController;
+use Arc\Framework\Controller;
 use Arc\Validator\ModelValidator;
 use Org\Repository\PostRepository;
 use Org\Model\Post;
 use Arc\Http\Request;
 use Arc\View\View;
 
-class PostsController extends BaseController
+class PostsController extends Controller
 {
     private PostRepository $repository;
 
@@ -59,7 +59,7 @@ class PostsController extends BaseController
         $errors = [];
 
         if ($this->request->isPost() &&
-            $post->load($this->request->getPost()) &&
+            $post->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($post))
         ) {
             $this->repository->save($post);

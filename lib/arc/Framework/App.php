@@ -14,19 +14,20 @@ class App
     {
         $this->config = $config;
     }
-    
+
     public function run()
     {
         try {
             $config = new Config($this->config);
-            $routes = $config->routes();
-            $router = new Router($routes, $config);
-            $request = new Request();
-            $view = new View(__DIR__ . '/../../../templates/');
-            $routeInfo = $router->detect($request->requestUri());
-            $controllerClass = $routeInfo['controllerClassName'];
+            $router = new Router($config->routes());
+            $request = Request::createFromGlobals();
+            $view = new View($config->basePath() . 'templates/');
+            $router->resolveRequest($request);
+            $controllerClass = $config->namespacePrefix() . 'Controller\\' . ucfirst($request->attributes('_controller')) . 'Controller';
             $controller = new $controllerClass($request, $view);
-            echo $controller->{$routeInfo['methodName']}($routeInfo['params']);
+            $method = $request->attributes('_action');
+            $params = $request->attributes('_params');
+            echo $controller->$method(...$params);
         } catch (\Throwable $exception) {
             echo '<h1>' . $exception->getMessage() . '</h1>';
             echo nl2br($exception->getTraceAsString()), '<br>';

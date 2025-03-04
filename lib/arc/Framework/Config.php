@@ -20,4 +20,9 @@ class Config
     {
         return $this->config['base_namespace'];
     }
+
+    public function basePath(): string
+    {
+        return $this->config['base_path'];
+    }
 }
