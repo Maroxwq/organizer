@@ -17,7 +17,8 @@ class Router
 
     public function detect(string $requestUri): array
     {
-        $uri = parse_url($requestUri, PHP_URL_PATH);
+        $parts = explode('?', $requestUri);
+        $uri = $parts[0];
 
         foreach ($this->routes as $route => $action) {
             $pattern = preg_replace('/:\w+/', '(\w+)', $route) . '/?';
