@@ -30,7 +30,7 @@ class PostsController extends BaseController
     {
         $id = (int)$params['id'];
         $post = $this->repository->getById($id);
-        
+
         if ($post === null) {
             throw new \RuntimeException('Post not found for ID: ' . $id);
         }
@@ -64,6 +64,7 @@ class PostsController extends BaseController
         ) {
             $this->repository->save($post);
             header('Location: /posts');
+            
             return '';
         }
 

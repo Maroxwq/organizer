@@ -12,9 +12,7 @@
                 <input type="hidden" name="id" value="<?= $note->getId() ?>">
                 <button type="submit" class="btn btn-danger">Удалить</button>
             </form>
-            <form method="POST" action="/notes/edit/<?= $note->getId() ?>" class="forms">
-                <input type="hidden" name="id" value="<?= $note->getId() ?>">
-                <button type="submit" class="btn btn-primary">Изменить</button>
+            <a href="/notes/edit/<?= $note->getId() ?>" class="btn btn-primary">Изменить</a>
             </form>
         </div>
     </div>

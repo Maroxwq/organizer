@@ -68,7 +68,7 @@ class NotesController extends BaseController
 
             return '';
         }
-    
+
         return $this->view->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
     }
 }

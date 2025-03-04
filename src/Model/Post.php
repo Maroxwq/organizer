@@ -35,6 +35,7 @@ class Post
     {
         $this->changeTitle($data['title']);
         $this->changeContent($data['content']);
+
         return true;
     }
 
