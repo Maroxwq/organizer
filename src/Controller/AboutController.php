@@ -3,10 +3,12 @@
 namespace Org\Controller;
 
 use Arc\Framework\BaseController;
+use Arc\Http\Request;
+use Arc\View\View;
 
 class AboutController extends BaseController
 {
-    public function __construct(\Arc\Http\Request $request, \Arc\View\View $view)
+    public function __construct(Request $request, View $view)
     {
         parent::__construct($request, $view);
         $this->view->setLayout('layout');

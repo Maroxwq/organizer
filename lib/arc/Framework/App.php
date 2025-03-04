@@ -21,7 +21,7 @@ class App
             $config = new Config($this->config);
             $routes = $config->routes();
             $router = new Router($routes, $config);
-            $request = new Request($_GET, $_POST, $_SERVER);
+            $request = new Request();
             $view = new View(__DIR__ . '/../../../templates/');
             $routeInfo = $router->detect($request->requestUri());
             $controllerClass = $routeInfo['controllerClassName'];

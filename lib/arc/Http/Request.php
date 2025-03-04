@@ -4,16 +4,16 @@ namespace Arc\Http;
 
 class Request
 {
-    private array $query;
-    private array $post;
-    private array $server;
-    private array $attributes;
+    private array $query; // $_GET
+    private array $post; // $_POST
+    private array $server; // $_SERVER
+    private array $attributes; // Custom attributes e.g. _controller, _method, _params
 
-    public function __construct(array $query, array $post, array $server, array $attributes = [])
+    public function __construct(array $query = null, array $post = null, array $server = null, array $attributes = [])
     {
-        $this->query = $query;
-        $this->post = $post;
-        $this->server = $server;
+        $this->query = $query ?? $_GET;
+        $this->post = $post ?? $_POST;
+        $this->server = $server ?? $_SERVER;
         $this->attributes = $attributes;
     }
 
@@ -22,7 +22,7 @@ class Request
         if ($key === null) {
             return $this->query;
         }
-        return $this->query[$key];
+        return $this->query[$key]; 
     }
 
     public function getPost(): array

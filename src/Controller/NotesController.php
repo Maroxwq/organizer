@@ -59,16 +59,16 @@ class NotesController extends BaseController
     private function handleForm(Note $note, string $templateName): string
     {
         $errors = [];
-        $post = $this->request->getPost();
-        if ($this->request->isPost() && isset($post['content'], $post['color'])) {
-            if ($note->load($post) && empty($errors = (new ModelValidator())->validate($note))) {
-                $this->repository->save($note);
-                header('Location: /notes');
-                return '';
-            }
+        if ($this->request->isPost() &&
+            $note->load($this->request->getPost()) &&
+            empty($errors = (new ModelValidator())->validate($note))
+        ) {
+            $this->repository->save($note);
+            header('Location: /notes');
+
+            return '';
         }
     
         return $this->view->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
     }
-    
 }

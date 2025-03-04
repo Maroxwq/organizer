@@ -20,9 +20,4 @@ class Config
     {
         return $this->config['base_namespace'];
     }
-
-    public function get(string $key)
-    {
-        return $this->config[$key];
-    }
 }

@@ -15,6 +15,7 @@
             <div class="d-flex">
                 <a href="/about" class="nav-link active text-dark pb-0 fs-5">About</a>
                 <a href="/notes" class="nav-link active text-dark pb-0 fs-5">Notes</a>
+                <a href="/posts" class="nav-link active text-dark pb-0 fs-5">Forum</a>
             </div>
 
             <a href="/login" class="btn btn-dark ms-auto" style="width: 100px;">Login</a>

@@ -9,4 +9,9 @@ return [
     '/notes/:id' => 'notes/viewNote',
     '/notes/:id/:order' => 'notes/viewNote',
     '/draft' => 'draft/index',
+    '/posts' => 'posts/index',
+    '/posts/add' => 'posts/add',
+    '/posts/edit/:id' => 'posts/edit',
+    '/posts/delete/:id' => 'posts/delete',
+    '/posts/:id' => 'posts/viewPost',
 ];
