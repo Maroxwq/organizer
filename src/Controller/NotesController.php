@@ -2,28 +2,28 @@
 
 namespace Org\Controller;
 
-use Arc\Framework\BaseController;
+use Arc\Framework\Controller;
 use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
+use Arc\Http\Request;
+use Arc\View\View;
 
-class NotesController extends BaseController
+class NotesController extends Controller
 {
     private NoteRepository $repository;
 
-    public function __construct()
+    public function __construct(Request $request, View $view)
     {
-        parent::__construct();
+        parent::__construct($request, $view);
         $this->repository = new NoteRepository();
-        $this->view()->setLayout('layout');
+        $this->view->setLayout('layout');
     }
 
     public function index(): string
     {
-        var_dump($_GET);
         $notes = $this->repository->findAll();
-
-        return $this->view()->render('notes/index', ['notes' => $notes]);
+        return $this->render('notes/index', ['notes' => $notes]);
     }
 
     public function add(): string
@@ -31,38 +31,34 @@ class NotesController extends BaseController
         return $this->handleForm(new Note, 'add');
     }
 
-    public function edit(array $params): string
+    public function edit(int $id): string
     {
-        return $this->handleForm($this->repository->getById((int) $params['id']), 'edit');
+        return $this->handleForm($this->repository->getById($id), 'edit');
     }
 
-    public function delete(): string
+    public function delete(int $id): string
     {
-        $id = $_POST['id'];
-        $this->repository->deleteNote((int)$id);
+        $this->repository->deleteNote($id);
         header('Location: /notes');
         return '';
     }
 
-    public function viewNote(array $params): string
+    public function viewNote(int $id): string
     {
-        $id = (int) $params['id'];
-        $repository = new NoteRepository();
-        $note = $repository->getById($id);
+        $note = $this->repository->getById($id);
 
         if ($note === null) {
             throw new \RuntimeException('Note not found for ID: ' . $id);
         }
 
-        return $this->view->render('notes/view', ['note' => $note]);
+        return $this->render('notes/view', ['note' => $note]);
     }
 
     private function handleForm(Note $note, string $templateName): string
     {
         $errors = [];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
-            $note->load($_POST) &&
+        if ($this->request->isPost() &&
+            $note->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($note))
         ) {
             $this->repository->save($note);
@@ -71,6 +67,6 @@ class NotesController extends BaseController
             return '';
         }
 
-        return $this->view()->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
+        return $this->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
     }
 }

@@ -2,18 +2,20 @@
 
 namespace Org\Controller;
 
-use Arc\Framework\BaseController;
+use Arc\Framework\Controller;
+use Arc\Http\Request;
+use Arc\View\View;
 
-class AboutController extends BaseController
+class AboutController extends Controller
 {
-    public function __construct()
+    public function __construct(Request $request, View $view)
     {
-        parent::__construct();
-        $this->view()->setLayout('layout');
+        parent::__construct($request, $view);
+        $this->view->setLayout('layout');
     }
 
     public function index()
     {
-        return $this->view()->render('about/index');
+        return $this->render('about/index');
     }
 }

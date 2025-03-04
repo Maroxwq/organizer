@@ -4,31 +4,57 @@ namespace Arc\Http;
 
 class Request
 {
-    private array $query; // $_GET
-    private array $post; // $_POST
-    private array $server; // $_SERVER
-    private array $attributes; // Custom attributes e.g. _controller, _method, _params
+    public function __construct(
+        private array $query = [],
+        private array $post = [],
+        private array $server = [],
+        private array $attributes = []
+    ) {}
 
-    public function __construct(array $query, array $post, array $server, array $attributes = [])
+    public function query(?string $key = null): string|array|null
     {
-        $this->query = $query;
-        $this->post = $post;
-        $this->server = $server;
-        $this->attributes = $attributes;
+        if ($key === null) {
+            return $this->query;
+        }
+
+        return $this->query[$key] ?? null; 
     }
 
-    public function query(string $key = null): string|array|null
+    public function post(?string $key = null): string|array|null
     {
-        
+        if ($key === null) {
+            return $this->post;
+        }
+
+        return $this->post[$key] ?? null;
     }
 
     public function requestUri(): string
     {
-        return $this->server['REQUEST_URI'];
+        return preg_replace('/\?.*/', '', $this->server['REQUEST_URI']);
     }
 
     public function isPost(): bool
     {
-        //$_SERVER['REQUEST_METHOD'] === 'POST'
+        return $this->server['REQUEST_METHOD'] === 'POST';
+    }
+
+    public function addAttributes(array $attrs): void
+    {
+        $this->attributes = array_merge($this->attributes, $attrs);
+    }
+
+    public function attributes(?string $key = null): string|array|null
+    {
+        if ($key === null) {
+            return $this->attributes;
+        }
+
+        return $this->attributes[$key] ?? null;
+    }
+
+    public static function createFromGlobals(): self
+    {
+        return new Request($_GET, $_POST, $_SERVER);
     }
 }

@@ -18,7 +18,7 @@ $this->extends('layout');
             <p class="colorstr">Цвет: <?= $note->getColor() ?></p>
             <p class="datechangedstr">Дата изменения: <?= $note->getDateChanged() ?></p> <br>
             <div class="d-flex justify-content-between">
-            <form method="POST" action="/notes/delete" class="forms">
+            <form method="POST" action="/notes/delete/<?= $note->getId() ?>" class="forms">
                 <input type="hidden" name="id" value="<?= $note->getId() ?>">
                 <button type="submit" class="btn btn-danger">Удалить</button>
             </form>
