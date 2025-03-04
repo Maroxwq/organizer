@@ -33,8 +33,7 @@ class NotesController extends BaseController
 
     public function edit(array $params): string
     {
-        $note = $this->repository->getById((int)$params['id']);
-        return $this->handleForm($note, 'edit');
+        return $this->handleForm($this->repository->getById((int) $params['id']), 'edit');
     }
 
     public function delete(array $params): string

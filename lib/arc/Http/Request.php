@@ -25,9 +25,12 @@ class Request
         return $this->query[$key]; 
     }
 
-    public function getPost(): array
+    public function getPost(string $key = null): array
     {
-        return $this->post;
+        if ($key === null) {
+            return $this->post;
+        }
+        return $this->post[$key];
     }
 
     public function requestUri(): string
