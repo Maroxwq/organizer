@@ -2,12 +2,12 @@
 
 namespace Org\Controller;
 
-use Arc\Framework\BaseController;
+use Arc\Framework\Controller;
 use Org\Model\User;
 use Arc\Http\Request;
 use Arc\View\View;
 
-class DraftController extends BaseController
+class DraftController extends Controller
 {
     public function __construct(Request $request, View $view)
     {
@@ -20,6 +20,6 @@ class DraftController extends BaseController
         $user = new User('', '', 0);
         $user->load($_POST);
 
-        return $this->view->render('draft/index');
+        return $this->render('draft/index');
     }
 }
