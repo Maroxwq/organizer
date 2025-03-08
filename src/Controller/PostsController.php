@@ -23,18 +23,17 @@ class PostsController extends Controller
     public function index(): string
     {
         $posts = $this->repository->findAll();
-        return $this->view->render('posts/index', ['posts' => $posts]);
+        return $this->render('posts/index', ['posts' => $posts]);
     }
 
-    public function viewPost(array $params): string
+    public function viewPost(int $id): string
     {
-        $id = (int)$params['id'];
         $post = $this->repository->getById($id);
 
         if ($post === null) {
             throw new \RuntimeException('Post not found for ID: ' . $id);
         }
-        return $this->view->render('posts/view', ['post' => $post]);
+        return $this->render('posts/view', ['post' => $post]);
     }
 
     public function add(): string
@@ -42,14 +41,18 @@ class PostsController extends Controller
         return $this->handleForm(new Post, 'add');
     }
 
-    public function edit(array $params): string
+    public function edit(int $id): string
     {
-        return $this->handleForm($this->repository->getById((int)$params['id']), 'edit');
+        $post = $this->repository->getById($id);
+        if ($post === null) {
+            throw new \RuntimeException('Post not found for ID: ' . $id);
+        }
+        return $this->handleForm($post, 'edit');
     }
 
-    public function delete(array $params): string
+    public function delete(int $id): string
     {
-        $this->repository->deletePost((int) $params['id']);
+        $this->repository->deletePost($id);
         header('Location: /posts');
         return '';
     }
@@ -68,6 +71,6 @@ class PostsController extends Controller
             return '';
         }
 
-        return $this->view->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
+        return $this->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
     }
 }
