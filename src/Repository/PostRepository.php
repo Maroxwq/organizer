@@ -8,19 +8,29 @@ use PDO;
 
 class PostRepository extends Repository
 {
-    public function __construct()
+    public function __construct(?\PDO $pdo = null)
     {
-        $pdo = new PDO('sqlite:' . realpath(__DIR__ . '/db.db'));
+        if (!$pdo) {
+            $pdo = new PDO('sqlite:' . realpath(__DIR__ . '/db.db'));
+        }
         parent::__construct($pdo, Post::class);
     }
 
+    /**
+     * @return Post[]
+     */
     public function findAll(): array
     {
         return $this->findBy([]);
     }
 
-    public function deletePost(int $id): bool
+    public function getById(int $id): ?Post
     {
-        return $this->delete($id);
+        return $this->findOne($id);
+    }
+
+    public function deletePost(int $id): void
+    {
+        $this->delete($id);
     }
 }

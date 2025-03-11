@@ -6,6 +6,7 @@ use Arc\Db\Model;
 
 class Post extends Model
 {
+    private ?int $id;
     private string $title;
     private string $content;
     private string $createdAt;
@@ -14,6 +15,7 @@ class Post extends Model
 
     public function __construct(string $title = '', string $content = '', string $authorName = 'Саша')
     {
+        $this->id = null;
         $this->title = $title;
         $this->content = $content;
         $this->authorName = $authorName;
@@ -50,11 +52,24 @@ class Post extends Model
 
     public function fromDbRow(array $dbRow): void
     {
-        $this->setId((int)$dbRow['id']);
+        $this->id = $dbRow['id'];
         $this->title = $dbRow['title'];
         $this->content = $dbRow['content'];
         $this->createdAt = $dbRow['createdAt'];
         $this->updatedAt = $dbRow['updatedAt'];
+        if (isset($dbRow['authorName'])) {
+            $this->authorName = $dbRow['authorName'];
+        }
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getTitle(): string

@@ -29,7 +29,6 @@ class PostsController extends Controller
     public function viewPost(int $id): string
     {
         $post = $this->repository->getById($id);
-
         if ($post === null) {
             throw new \RuntimeException('Post not found for ID: ' . $id);
         }
@@ -44,9 +43,6 @@ class PostsController extends Controller
     public function edit(int $id): string
     {
         $post = $this->repository->getById($id);
-        if ($post === null) {
-            throw new \RuntimeException('Post not found for ID: ' . $id);
-        }
         return $this->handleForm($post, 'edit');
     }
 
@@ -60,17 +56,14 @@ class PostsController extends Controller
     private function handleForm(Post $post, string $templateName): string
     {
         $errors = [];
-
         if ($this->request->isPost() &&
             $post->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($post))
         ) {
             $this->repository->save($post);
             header('Location: /posts');
-            
             return '';
         }
-
         return $this->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
     }
 }

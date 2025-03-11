@@ -2,61 +2,61 @@
 
 namespace Arc\Db;
 
-use PDO;
-
 abstract class Repository
 {
-    public function __construct(protected PDO $pdo, private string $modelClass) {}
+    public function __construct(protected \PDO $pdo, private string $modelClass) {}
 
-    public function findBy(int|array $where = []): array
+    public function findBy(array $where = []): array
+    {
+        $table = $this->tableName();
+        $attributes = $this->attributes();
+
+        $sql = "SELECT * FROM " . $table;
+        $params = [];
+        $first = true;
+
+        foreach ($where as $column => $value) {
+            if (!in_array($column, $attributes) && $column !== 'id') {
+                continue;
+            }
+            if ($first) {
+                $sql .= " WHERE " . $column . " = ?";
+                $first = false;
+            } else {
+                $sql .= " AND " . $column . " = ?";
+            }
+            $params[] = $value;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll();
+
+        $results = [];
+        foreach ($rows as $row) {
+            $modelClass = $this->modelClass;
+            $model = new $modelClass();
+            if (method_exists($model, 'fromDbRow')) {
+                $model->fromDbRow($row);
+            }
+            $results[] = $model;
+        }
+        
+        return $results;
+    }
+
+    public function findOne(array|int $where): ?Model
     {
         if (is_int($where)) {
-            $where = ['id' => $where];
+            return $this->findBy(['id' => $where])[0] ?? null;
         }
-        
-        $table = $this->modelClass::tableName();
-        $sql = "SELECT * FROM " . $table;
-        
-        if (!empty($where)) {
-            $conditions = "";
-            foreach ($where as $key => $value) {
-                if ($conditions !== "") {
-                    $conditions .= " AND ";
-                }
-                $conditions .= $key . " = :" . $key;
-            }
-            $sql .= " WHERE " . $conditions;
-        }
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($where);
-        $rows = $stmt->fetchAll();
-        $models = [];
-        
-        foreach ($rows as $row) {
-            $model = new $this->modelClass();
-            $model->fromDbRow($row);
-            $models[] = $model;
-        }
-        return $models;
-    }
-
-    public function findOne(int|array $where): ?Model
-    {
-        $results = $this->findBy($where);
-        return count($results) > 0 ? $results[0] : null;
-    }
-
-    public function getById(int $id): ?Model
-    {
-        return $this->findOne($id);
+        return $this->findBy($where)[0] ?? null;
     }
 
     public function save(Model $model): bool
     {
-        $table = get_class($model)::tableName();
-        $attributes = get_class($model)::attributes();
-        
+        $table = $this->tableName();
+        $attributes = $this->attributes();
         $data = [];
         foreach ($attributes as $attr) {
             $getter = 'get' . ucfirst($attr);
@@ -64,45 +64,76 @@ abstract class Repository
                 $data[$attr] = $model->$getter();
             }
         }
-        
         if ($model->getId() === null) {
             $columns = "";
             $placeholders = "";
-            foreach ($data as $key => $value) {
-                if ($columns !== "") {
-                    $columns .= ", ";
-                    $placeholders .= ", ";
+            $params = [];
+            $first = true;
+
+            foreach ($data as $column => $value) {
+                if ($first) {
+                    $columns .= $column;
+                    $placeholders .= "?";
+                    $first = false;
+                } else {
+                    $columns .= ", " . $column;
+                    $placeholders .= ", ?";
                 }
-                $columns .= $key;
-                $placeholders .= ":" . $key;
+
+                $params[] = $value;
             }
+
             $sql = "INSERT INTO " . $table . " (" . $columns . ") VALUES (" . $placeholders . ")";
             $stmt = $this->pdo->prepare($sql);
-            $result = $stmt->execute($data);
-            if ($result) {
-                $model->setId((int)$this->pdo->lastInsertId());
-            }
-            return $result;
-        } else {
-            $setString = "";
-            foreach ($data as $key => $value) {
-                if ($setString !== "") {
-                    $setString .= ", ";
+            $success = $stmt->execute($params);
+
+            if ($success) {
+                $id = (int)$this->pdo->lastInsertId();
+                if (method_exists($model, 'setId')) {
+                    $model->setId($id);
                 }
-                $setString .= $key . " = :" . $key;
             }
-            $sql = "UPDATE " . $table . " SET " . $setString . " WHERE id = :id";
-            $data['id'] = $model->getId();
+
+            return $success;
+        } else {
+            $setClause = "";
+            $params = [];
+            $first = true;
+
+            foreach ($data as $column => $value) {
+                if ($first) {
+                    $setClause .= $column . " = ?";
+                    $first = false;
+                } else {
+                    $setClause .= ", " . $column . " = ?";
+                }
+                $params[] = $value;
+            }
+
+            $params[] = $model->getId();
+            $sql = "UPDATE " . $table . " SET " . $setClause . " WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute($data);
+
+            return $stmt->execute($params);
         }
     }
 
     public function delete(int $id): bool
     {
-        $table = $this->modelClass::tableName();
-        $sql = "DELETE FROM " . $table . " WHERE id = :id";
+        $table = $this->tableName();
+        $sql = "DELETE FROM " . $table . " WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute(['id' => $id]);
+
+        return $stmt->execute([$id]);
+    }
+
+    protected function tableName(): string
+    {
+        return $this->modelClass::tableName();
+    }
+
+    protected function attributes(): array
+    {
+        return $this->modelClass::attributes();
     }
 }

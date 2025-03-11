@@ -8,19 +8,29 @@ use PDO;
 
 class NoteRepository extends Repository
 {
-    public function __construct()
+    public function __construct(?\PDO $pdo = null)
     {
-        $pdo = new PDO('sqlite:' . realpath(__DIR__ . '/db.db'));
+        if (!$pdo) {
+            $pdo = new PDO('sqlite:' . realpath(__DIR__ . '/db.db'));
+        }
         parent::__construct($pdo, Note::class);
     }
 
+    /**
+     * @return Note[]
+     */
     public function findAll(): array
     {
         return $this->findBy([]);
     }
 
-    public function deleteNote(int $id): bool
+    public function getById(int $id): ?Note
     {
-        return $this->delete($id);
+        return $this->findOne($id);
+    }
+
+    public function deleteNote(int $id): void
+    {
+        $this->delete($id);
     }
 }
