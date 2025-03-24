@@ -6,10 +6,9 @@ use Arc\Db\Model;
 
 class Note extends Model
 {
-    private ?int $id;
-    private string $content;
-    private string $dateChanged;
-    private string $color;
+    protected string $content;
+    protected string $dateChanged;
+    protected string $color;
 
     public static function tableName(): string
     {
@@ -23,7 +22,6 @@ class Note extends Model
 
     public function __construct(string $content = '', string $color = '')
     {
-        $this->id = null;
         $this->content = $content;
         $this->color = $color;
         $this->dateChanged = date('Y-m-d H:i:s');
@@ -36,36 +34,6 @@ class Note extends Model
             ['content' => ['string' => ['maxLength' => 255]]],
             ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
-    }
-
-    public function load(array $data): bool
-    {
-        $this->changeContent($data['content'] ?? '');
-        $this->changeColor($data['color'] ?? '');
-        return true;
-    }
-
-    public function fromDbRow(array $dbRow): void
-    {
-        $this->id = $dbRow['id'];
-        $this->content = $dbRow['content'];
-        $this->dateChanged = $dbRow['dateChanged'];
-        $this->color = $dbRow['color'];
-    }
-
-    public function asString(): string
-    {
-        return "$this->content, $this->dateChanged - $this->color";
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-    
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getContent(): string
@@ -83,15 +51,17 @@ class Note extends Model
         return $this->color;
     }
 
-    public function changeContent(string $newContent)
+    public function changeContent(string $newContent): self
     {
         $this->content = $newContent;
         $this->dateChanged = date('Y-m-d H:i:s');
+        return $this;
     }
 
-    public function changeColor(string $newColor)
+    public function changeColor(string $newColor): self
     {
         $this->color = $newColor;
         $this->dateChanged = date('Y-m-d H:i:s');
+        return $this;
     }
 }

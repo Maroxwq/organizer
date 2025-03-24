@@ -6,23 +6,14 @@ use Arc\Framework\Controller;
 use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
-use Arc\Http\Request;
-use Arc\View\View;
 
 class NotesController extends Controller
 {
-    private NoteRepository $repository;
-
-    public function __construct(Request $request, View $view)
-    {
-        parent::__construct($request, $view);
-        $this->repository = new NoteRepository();
-        $this->view->setLayout('layout');
-    }
-
     public function index(): string
     {
-        $notes = $this->repository->findAll();
+        $repo = $this->repository(Note::class);
+        $notes = $repo->findAll();
+
         return $this->render('notes/index', ['notes' => $notes]);
     }
 
@@ -33,19 +24,20 @@ class NotesController extends Controller
 
     public function edit(int $id): string
     {
-        return $this->handleForm($this->repository->getById($id), 'edit');
+        return $this->handleForm($this->noteRepository()->findOne($id), 'edit');
     }
 
     public function delete(int $id): string
     {
-        $this->repository->deleteNote($id);
+        $this->noteRepository()->delete($id);
         header('Location: /notes');
+
         return '';
     }
 
     public function viewNote(int $id): string
     {
-        $note = $this->repository->getById($id);
+        $note = $this->noteRepository()->findOne($id);
 
         if ($note === null) {
             throw new \RuntimeException('Note not found for ID: ' . $id);
@@ -61,12 +53,20 @@ class NotesController extends Controller
             $note->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($note))
         ) {
-            $this->repository->save($note);
+            $this->noteRepository()->save($note);
             header('Location: /notes');
 
             return '';
         }
 
         return $this->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
+    }
+
+    private function noteRepository(): NoteRepository
+    {
+        /** @var NoteRepository $repo */
+        $repo = $this->repository(Note::class);
+
+        return $repo;
     }
 }

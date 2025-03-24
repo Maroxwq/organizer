@@ -25,4 +25,9 @@ class Config
     {
         return $this->config['base_path'];
     }
+
+    public function db(): array
+    {
+        return $this->config['db'];
+    }
 }

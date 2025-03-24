@@ -6,22 +6,11 @@ use Arc\Db\Model;
 
 class Post extends Model
 {
-    private ?int $id;
-    private string $title;
-    private string $content;
-    private string $createdAt;
-    private string $updatedAt;
-    private string $authorName;
-
-    public function __construct(string $title = '', string $content = '', string $authorName = 'Саша')
-    {
-        $this->id = null;
-        $this->title = $title;
-        $this->content = $content;
-        $this->authorName = $authorName;
-        $this->createdAt = date('Y-m-d H:i:s');
-        $this->updatedAt = date('Y-m-d H:i:s');
-    }
+    protected string $title;
+    protected string $content;
+    protected string $createdAt;
+    protected string $updatedAt;
+    protected string $authorName;
 
     public static function tableName(): string
     {
@@ -33,6 +22,15 @@ class Post extends Model
         return ['title', 'content', 'createdAt', 'updatedAt'];
     }
 
+    public function __construct(string $title = '', string $content = '', string $authorName = 'Саша')
+    {
+        $this->title = $title;
+        $this->content = $content;
+        $this->authorName = $authorName;
+        $this->createdAt = date('Y-m-d H:i:s');
+        $this->updatedAt = date('Y-m-d H:i:s');
+    }
+
     public function validationRules(): array
     {
         return [
@@ -41,35 +39,6 @@ class Post extends Model
             ['content' => ['required' => true]],
             ['content' => ['string' => ['maxLength' => 1000]]]
         ];
-    }
-
-    public function load(array $data): bool
-    {
-        $this->changeTitle($data['title'] ?? '');
-        $this->changeContent($data['content'] ?? '');
-        return true;
-    }
-
-    public function fromDbRow(array $dbRow): void
-    {
-        $this->id = $dbRow['id'];
-        $this->title = $dbRow['title'];
-        $this->content = $dbRow['content'];
-        $this->createdAt = $dbRow['createdAt'];
-        $this->updatedAt = $dbRow['updatedAt'];
-        if (isset($dbRow['authorName'])) {
-            $this->authorName = $dbRow['authorName'];
-        }
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-    
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getTitle(): string
@@ -92,6 +61,11 @@ class Post extends Model
         return $this->updatedAt;
     }
 
+    public function getAuthorName(): string
+    {
+        return $this->authorName;
+    }
+
     public function changeTitle(string $newTitle): void
     {
         $this->title = $newTitle;
@@ -102,10 +76,5 @@ class Post extends Model
     {
         $this->content = $newContent;
         $this->updatedAt = date('Y-m-d H:i:s');
-    }
-
-    public function getAuthorName(): string
-    {
-        return $this->authorName;
     }
 }

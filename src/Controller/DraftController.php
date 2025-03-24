@@ -2,24 +2,30 @@
 
 namespace Org\Controller;
 
+use Arc\Db\Query;
 use Arc\Framework\Controller;
-use Org\Model\User;
-use Arc\Http\Request;
-use Arc\View\View;
+use Note;
 
 class DraftController extends Controller
 {
-    public function __construct(Request $request, View $view)
-    {
-        parent::__construct($request, $view);
-        $this->view->setLayout('layout');
-    }
+    // public function index()
+    // {
+    //     (new Note('', ''))
+    //         ->changeContent('dqwd')
+    //         ->changeColor('color1')
+    //     ;
 
-    public function index()
-    {
-        $user = new User('', '', 0);
-        $user->load($_POST);
+    //     $notes = (new Query($this->dbManager->getConnection()))
+    //         ->select()
+    //         ->from('note')
+    //         ->all()
+    //     ;
 
-        return $this->render('draft/index');
-    }
+
+
+
+
+
+    //     return $this->render('draft/index');
+    // }
 }
