@@ -34,12 +34,14 @@ class Query implements QueryInterface
         } else {
             $this->select = $fields;
         }
+
         return $this;
     }
 
     public function from(string $table): self
     {
         $this->from = $table;
+
         return $this;
     }
 
