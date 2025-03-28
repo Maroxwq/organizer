@@ -8,24 +8,16 @@ use Note;
 
 class DraftController extends Controller
 {
-    // public function index()
-    // {
-    //     (new Note('', ''))
-    //         ->changeContent('dqwd')
-    //         ->changeColor('color1')
-    //     ;
-
-    //     $notes = (new Query($this->dbManager->getConnection()))
-    //         ->select()
-    //         ->from('note')
-    //         ->all()
-    //     ;
+    public function index()
+    {
+        session_start();
+        // $_SESSION['key1'] = 'Vasya';
 
 
 
 
 
 
-    //     return $this->render('draft/index');
-    // }
+        return $this->render('draft/index');
+    }
 }

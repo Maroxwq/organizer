@@ -6,9 +6,9 @@ use Arc\Db\Model;
 
 class Note extends Model
 {
-    protected string $content;
-    protected string $dateChanged;
-    protected string $color;
+    protected string $content = '';
+    protected string $dateChanged = '';
+    protected string $color = '';
 
     public static function tableName(): string
     {
@@ -20,19 +20,12 @@ class Note extends Model
         return ['content', 'dateChanged', 'color'];
     }
 
-    public function __construct(string $content = '', string $color = '')
-    {
-        $this->content = $content;
-        $this->color = $color;
-        $this->dateChanged = date('Y-m-d H:i:s');
-    }
-
     public function validationRules()
     {
         return [
             ['content' => ['required' => true]],
-            ['content' => ['string' => ['maxLength' => 255]]],
-            ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
+            ['content' => ['string'   => ['maxLength' => 255]]],
+            ['color'   => ['regex'    => ['pattern'   => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
     }
 
@@ -51,17 +44,19 @@ class Note extends Model
         return $this->color;
     }
 
-    public function changeContent(string $newContent): self
+    public function setContent(string $newContent): self
     {
         $this->content = $newContent;
         $this->dateChanged = date('Y-m-d H:i:s');
+        
         return $this;
     }
 
-    public function changeColor(string $newColor): self
+    public function setColor(string $newColor): self
     {
         $this->color = $newColor;
         $this->dateChanged = date('Y-m-d H:i:s');
+        
         return $this;
     }
 }

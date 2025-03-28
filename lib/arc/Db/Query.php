@@ -2,46 +2,29 @@
 
 namespace Arc\Db;
 
-class Query implements QueryInterface
+class Query
 {
-    protected string $select = '*';
-    protected string $from = '';
-    protected array $conditions = [];
-    protected array $params = [];
-    protected ?int $limit = null;
-    protected ?int $offset = null;
-    protected ?string $orderBy = null;
-    protected \PDO $pdo;
+    private string $select = '*';
+    private string $from = '';
+    private array $conditions = [];
+    private array $params = [];
+    private ?int $limit = null;
+    private ?int $offset = null;
+    private ?string $orderBy = null;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(private \PDO $pdo) {}
 
     public function select(array|string $fields = '*'): self
     {
-        if (is_array($fields)) {
-            $str = '';
-            $first = true;
-            foreach ($fields as $field) {
-                if (!$first) {
-                    $str .= ', ';
-                }
-                $str .= $field;
-                $first = false;
-            }
-            $this->select = $str;
-        } else {
-            $this->select = $fields;
-        }
-
+        $this->select = is_array($fields) ? implode(', ', $fields) : $fields;
+        
         return $this;
     }
 
     public function from(string $table): self
     {
         $this->from = $table;
-
+        
         return $this;
     }
 
@@ -49,12 +32,8 @@ class Query implements QueryInterface
     {
         $this->conditions = [];
         $this->params = [];
-        foreach ($conditions as $column => $value) {
-            $this->conditions[] = $column . " = ?";
-            $this->params[] = $value;
-        }
 
-        return $this;
+        return $this->andWhere($conditions);
     }
 
     public function andWhere(array $conditions): self
@@ -63,107 +42,71 @@ class Query implements QueryInterface
             $this->conditions[] = $column . " = ?";
             $this->params[] = $value;
         }
-
-        return $this;
-    }
-
-    public function orWhere(array $conditions): self
-    {
-        $or = '';
-        $first = true;
-        foreach ($conditions as $column => $value) {
-            if (!$first) {
-                $or .= " OR ";
-            }
-            $or .= $column . " = ?";
-            $this->params[] = $value;
-            $first = false;
-        }
-        if ($or !== '') {
-            $this->conditions[] = '(' . $or . ')';
-        }
-
+        
         return $this;
     }
 
     public function limit(int $limit): self
     {
         $this->limit = $limit;
-
+        
         return $this;
     }
 
     public function offset(int $offset): self
     {
         $this->offset = $offset;
-
+        
         return $this;
     }
 
     public function orderBy(array $fields): self
     {
-        $str = '';
-        $first = true;
-        foreach ($fields as $field) {
-            if (!$first) {
-                $str .= ', ';
+        $orders = [];
+        foreach ($fields as $column => $direction) {
+            if (is_string($column)) {
+                $orders[] = $column . " " . $direction;
+            } else {
+                $orders[] = $direction;
             }
-            $str .= $field;
-            $first = false;
         }
-        $this->orderBy = $str;
-
+        $this->orderBy = implode(', ', $orders);
+        
         return $this;
     }
 
     public function insert(array $values): int
     {
-        $columns = '';
-        $placeholders = '';
+        $columnsArr = [];
+        $placeholdersArr = [];
         $params = [];
-        $first = true;
         foreach ($values as $column => $value) {
-            if (!$first) {
-                $columns .= ", ";
-                $placeholders .= ", ";
-            }
-            $columns .= $column;
-            $placeholders .= "?";
+            $columnsArr[] = $column;
+            $placeholdersArr[] = "?";
             $params[] = $value;
-            $first = false;
         }
+        $columns = implode(', ', $columnsArr);
+        $placeholders = implode(', ', $placeholdersArr);
         $sql = "INSERT INTO " . $this->from . " (" . $columns . ") VALUES (" . $placeholders . ")";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-
-        return (int)$this->pdo->lastInsertId();
+        
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function update(array $values): int
     {
-        $set = '';
+        $setArr = [];
         $params = [];
-        $first = true;
         foreach ($values as $column => $value) {
-            if (!$first) {
-                $set .= ", ";
-            }
-            $set .= $column . " = ?";
+            $setArr[] = $column . " = ?";
             $params[] = $value;
-            $first = false;
         }
+        $set = implode(', ', $setArr);
         $sql = "UPDATE " . $this->from . " SET " . $set;
-        if (count($this->conditions) > 0) {
-            $whereClause = "";
-            $firstCond = true;
-            foreach ($this->conditions as $cond) {
-                if (!$firstCond) {
-                    $whereClause .= " AND ";
-                }
-                $whereClause .= $cond;
-                $firstCond = false;
-            }
-            $sql .= " WHERE " . $whereClause;
+        $wherePart = $this->buildWherePart();
+        if ($wherePart !== '') {
+            $sql .= $wherePart;
         }
         if ($this->limit !== null) {
             $sql .= " LIMIT " . $this->limit;
@@ -173,81 +116,80 @@ class Query implements QueryInterface
         }
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        
+        return $stmt->rowCount();
+    }
+
+    public function delete(): int
+    {
+        $sql = "DELETE FROM " . $this->from . $this->buildWherePart();
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($this->params);
 
         return $stmt->rowCount();
     }
 
     public function all(): array
     {
-        $sql = $this->buildSelect();
+        $sql = $this->buildSelectQuery();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
-
+        
         return $stmt->fetchAll();
     }
 
     public function one(): ?array
     {
         $this->limit = 1;
-        $sql = $this->buildSelect();
+        $sql = $this->buildSelectQuery();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
         $row = $stmt->fetch();
-
-        return $row ? $row : null;
+        
+        return $row ?: null;
     }
 
     public function count(): int
     {
-        $sql = "SELECT COUNT(*) FROM " . $this->from;
-        if (count($this->conditions) > 0) {
-            $whereClause = "";
-            $firstCond = true;
-            foreach ($this->conditions as $cond) {
-                if (!$firstCond) {
-                    $whereClause .= " AND ";
-                }
-                $whereClause .= $cond;
-                $firstCond = false;
-            }
-            $sql .= " WHERE " . $whereClause;
-        }
+        $sql = "SELECT COUNT(*) FROM " . $this->from . $this->buildWherePart();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
 
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
 
-    public function sql(): string
-    {
-        return $this->buildSelect();
-    }
-
-    protected function buildSelect(): string
+    private function buildSelectQuery(): string
     {
         $sql = "SELECT " . $this->select . " FROM " . $this->from;
-        if (count($this->conditions) > 0) {
-            $whereClause = "";
-            $firstCond = true;
-            foreach ($this->conditions as $cond) {
-                if (!$firstCond) {
-                    $whereClause .= " AND ";
-                }
-                $whereClause .= $cond;
-                $firstCond = false;
-            }
-            $sql .= " WHERE " . $whereClause;
-        }
-        if ($this->orderBy !== null) {
-            $sql .= " ORDER BY " . $this->orderBy;
-        }
-        if ($this->limit !== null) {
-            $sql .= " LIMIT " . $this->limit;
-        }
-        if ($this->offset !== null) {
-            $sql .= " OFFSET " . $this->offset;
-        }
-
+        $sql .= $this->buildWherePart();
+        $sql .= $this->buildOrderByPart();
+        $sql .= $this->buildLimitPart();
+        $sql .= $this->buildOffsetPart();
+        
         return $sql;
+    }
+
+    private function buildWherePart(): string
+    {
+        if (count($this->conditions) > 0) {
+            return " WHERE " . implode(" AND ", $this->conditions);
+        }
+        
+        return '';
+    }
+
+    private function buildOrderByPart(): string
+    {
+        return $this->orderBy !== null ? " ORDER BY " . $this->orderBy : '';
+    }
+
+    private function buildLimitPart(): string
+    {
+        return $this->limit !== null ? " LIMIT " . $this->limit : '';
+    }
+
+    private function buildOffsetPart(): string
+    {
+        return $this->offset !== null ? " OFFSET " . $this->offset : '';
     }
 }

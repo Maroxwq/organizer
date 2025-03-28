@@ -5,6 +5,7 @@ namespace Arc\Db;
 class DbManager
 {
     private ?\PDO $pdo = null;
+    private array $repositories = [];
 
     public function __construct(private array $dbConfig) {}
 
@@ -19,9 +20,12 @@ class DbManager
 
     public function getRepository(string $modelClass): Repository
     {
-        $modelDefinition = new ModelDefinition($modelClass);
-        $repoClassName = $modelDefinition->getRepositoryClass();
-    
-        return new $repoClassName($this->getConnection(), $modelDefinition);
+        if (!isset($this->repositories[$modelClass])) {
+            $modelDefinition = new ModelDefinition($modelClass);
+            $repoClassName = $modelDefinition->getRepositoryClass();
+            $this->repositories[$modelClass] = new $repoClassName($this->getConnection(), $modelDefinition);
+        }
+
+        return $this->repositories[$modelClass];
     }
 }

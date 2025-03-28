@@ -8,10 +8,7 @@ class ModelDefinition
 
     public function getRepositoryClass(): string
     {
-        $parts = explode('\\', $this->modelClass);
-        $className = end($parts);
-
-        return '\\Org\\Repository\\' . $className . 'Repository';
+        return str_replace('\\Model\\', '\\Repository\\', $this->modelClass) . 'Repository';
     }
 
     public function getModelClass(): string

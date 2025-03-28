@@ -6,11 +6,11 @@ use Arc\Db\Model;
 
 class Post extends Model
 {
-    protected string $title;
-    protected string $content;
-    protected string $createdAt;
-    protected string $updatedAt;
-    protected string $authorName;
+    protected string $title = '';
+    protected string $content = '';
+    protected string $createdAt = '';
+    protected string $updatedAt = '';
+    protected string $authorName = 'Саша';
 
     public static function tableName(): string
     {
@@ -22,22 +22,13 @@ class Post extends Model
         return ['title', 'content', 'createdAt', 'updatedAt'];
     }
 
-    public function __construct(string $title = '', string $content = '', string $authorName = 'Саша')
-    {
-        $this->title = $title;
-        $this->content = $content;
-        $this->authorName = $authorName;
-        $this->createdAt = date('Y-m-d H:i:s');
-        $this->updatedAt = date('Y-m-d H:i:s');
-    }
-
     public function validationRules(): array
     {
         return [
-            ['title' => ['required' => true]],
-            ['title' => ['string' => ['maxLength' => 255]]],
+            ['title'   => ['required' => true]],
+            ['title'   => ['string'   => ['maxLength' => 255]]],
             ['content' => ['required' => true]],
-            ['content' => ['string' => ['maxLength' => 1000]]]
+            ['content' => ['string'   => ['maxLength' => 1000]]],
         ];
     }
 
@@ -66,7 +57,7 @@ class Post extends Model
         return $this->authorName;
     }
 
-    public function changeTitle(string $newTitle): void
+    public function setTitle(string $newTitle): void
     {
         $this->title = $newTitle;
         $this->updatedAt = date('Y-m-d H:i:s');

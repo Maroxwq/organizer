@@ -3,6 +3,8 @@
 namespace Org\Controller;
 
 use Arc\Framework\Controller;
+use Arc\Http\RedirectResponse;
+use Arc\Http\Response;
 use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
@@ -27,12 +29,13 @@ class NotesController extends Controller
         return $this->handleForm($this->noteRepository()->findOne($id), 'edit');
     }
 
-    public function delete(int $id): string
+    public function delete(int $id): Response
     {
         $this->noteRepository()->delete($id);
-        header('Location: /notes');
+        // header('Location: /notes');
 
-        return '';
+        // return '';
+        return new RedirectResponse('/notes');
     }
 
     public function viewNote(int $id): string

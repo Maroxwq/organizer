@@ -12,7 +12,7 @@ class Controller
     public function __construct(
         protected Request $request,
         protected View $view,
-        protected DbManager $dbManager,
+        protected DbManager $dbManager
     ) {
         $this->view->setLayout('layout');
     }
