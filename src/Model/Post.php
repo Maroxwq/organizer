@@ -6,11 +6,11 @@ use Arc\Db\Model;
 
 class Post extends Model
 {
-    protected string $title = '';
-    protected string $content = '';
-    protected string $createdAt = '';
-    protected string $updatedAt = '';
-    protected string $authorName = 'Саша';
+    private string $title = '';
+    private string $content = '';
+    private string $createdAt = '';
+    private string $updatedAt = '';
+    private string $authorName = 'Саша';
 
     public static function tableName(): string
     {
@@ -63,9 +63,19 @@ class Post extends Model
         $this->updatedAt = date('Y-m-d H:i:s');
     }
 
-    public function changeContent(string $newContent): void
+    public function setContent(string $newContent): void
     {
         $this->content = $newContent;
         $this->updatedAt = date('Y-m-d H:i:s');
+    }
+
+    public function setCreatedAt(string $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt(string $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }

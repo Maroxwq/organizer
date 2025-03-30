@@ -59,4 +59,11 @@ class Note extends Model
         
         return $this;
     }
+
+    public function setDateChanged(string $dateChanged): self
+    {
+        $this->dateChanged = $dateChanged;
+
+        return $this;
+    }
 }

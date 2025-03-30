@@ -25,4 +25,11 @@ class ModelDefinition
     {
         return $this->modelClass::attributes();
     }
+
+    public function createModelFromArray(array $data): Model
+    {
+        $modelClass = $this->modelClass;
+
+        return $modelClass::fromArray($data);
+    }
 }

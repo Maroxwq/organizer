@@ -17,7 +17,7 @@ abstract class Model
     public function setId(int $id): self
     {
         $this->id = $id;
-
+        
         return $this;
     }
 
@@ -28,18 +28,20 @@ abstract class Model
 
     public function load(array $data): bool
     {
+        $isSet = false;
         foreach (static::attributes() as $attr) {
             if (isset($data[$attr])) {
                 $setter = 'set' . ucfirst($attr);
                 if (method_exists($this, $setter)) {
                     $this->$setter($data[$attr]);
+                    $isSet = true;
                 } else {
-                    $this->$attr = $data[$attr];
+                    throw new \RuntimeException("Setter {$setter} not found.");
                 }
             }
         }
-
-        return true;
+        
+        return $isSet;
     }
 
     public function asArray(): array
@@ -50,10 +52,10 @@ abstract class Model
             if (method_exists($this, $getter)) {
                 $data[$attr] = $this->$getter();
             } else {
-                $data[$attr] = $this->$attr;
+                throw new \RuntimeException("Getter {$getter} not found.");
             }
         }
-
+        
         return $data;
     }
 
@@ -64,7 +66,7 @@ abstract class Model
         if (isset($data['id'])) {
             $model->setId((int) $data['id']);
         }
-
+        
         return $model;
     }
 }

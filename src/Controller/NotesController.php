@@ -13,8 +13,7 @@ class NotesController extends Controller
 {
     public function index(): string
     {
-        $repo = $this->repository(Note::class);
-        $notes = $repo->findAll();
+        $notes = $this->noteRepository()->findAll();
 
         return $this->render('notes/index', ['notes' => $notes]);
     }

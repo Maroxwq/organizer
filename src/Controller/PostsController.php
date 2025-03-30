@@ -11,8 +11,7 @@ class PostsController extends Controller
 {
     public function index(): string
     {
-        $repo = $this->repository(Post::class);
-        $posts = $repo->findAll();
+        $posts = $this->postRepository()->findAll();
 
         return $this->render('posts/index', ['posts' => $posts]);
     }
@@ -59,6 +58,7 @@ class PostsController extends Controller
 
             return '';
         }
+
         return $this->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
     }
 

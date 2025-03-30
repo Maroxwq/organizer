@@ -12,19 +12,21 @@ class Query
     private ?int $offset = null;
     private ?string $orderBy = null;
 
-    public function __construct(private \PDO $pdo) {}
+    public function __construct(private \PDO $pdo)
+    {
+    }
 
     public function select(array|string $fields = '*'): self
     {
         $this->select = is_array($fields) ? implode(', ', $fields) : $fields;
-        
+
         return $this;
     }
 
     public function from(string $table): self
     {
         $this->from = $table;
-        
+
         return $this;
     }
 
@@ -42,21 +44,21 @@ class Query
             $this->conditions[] = $column . " = ?";
             $this->params[] = $value;
         }
-        
+
         return $this;
     }
 
     public function limit(int $limit): self
     {
         $this->limit = $limit;
-        
+
         return $this;
     }
 
     public function offset(int $offset): self
     {
         $this->offset = $offset;
-        
+
         return $this;
     }
 
@@ -64,46 +66,39 @@ class Query
     {
         $orders = [];
         foreach ($fields as $column => $direction) {
-            if (is_string($column)) {
-                $orders[] = $column . " " . $direction;
+            if (is_int($column)) {
+                $orders[] = $direction . " ASC";
             } else {
-                $orders[] = $direction;
+                $orders[] = $column . " " . $direction;
             }
         }
         $this->orderBy = implode(', ', $orders);
-        
+
         return $this;
     }
 
     public function insert(array $values): int
     {
-        $columnsArr = [];
-        $placeholdersArr = [];
-        $params = [];
-        foreach ($values as $column => $value) {
-            $columnsArr[] = $column;
-            $placeholdersArr[] = "?";
-            $params[] = $value;
+        if (empty($values)) {
+            throw new \InvalidArgumentException("Values array cannot be empty");
         }
-        $columns = implode(', ', $columnsArr);
-        $placeholders = implode(', ', $placeholdersArr);
-        $sql = "INSERT INTO " . $this->from . " (" . $columns . ") VALUES (" . $placeholders . ")";
+        
+        $columns = implode(', ', array_keys($values));
+        $placeholders = implode(', ', array_fill(0, count($values), '?'));
+        $params = array_values($values);
+        $sql = sprintf('INSERT INTO %s (%s) VALUES (%s)', $this->from, $columns, $placeholders);
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        
+
         return (int) $this->pdo->lastInsertId();
     }
 
     public function update(array $values): int
     {
-        $setArr = [];
-        $params = [];
-        foreach ($values as $column => $value) {
-            $setArr[] = $column . " = ?";
-            $params[] = $value;
-        }
+        $setArr = array_map(fn($col) => $col . " = ?", array_keys($values));
+        $params = array_values($values);
         $set = implode(', ', $setArr);
-        $sql = "UPDATE " . $this->from . " SET " . $set;
+        $sql = sprintf('UPDATE %s SET %s', $this->from, $set);
         $wherePart = $this->buildWherePart();
         if ($wherePart !== '') {
             $sql .= $wherePart;
@@ -111,12 +106,10 @@ class Query
         if ($this->limit !== null) {
             $sql .= " LIMIT " . $this->limit;
         }
-        foreach ($this->params as $p) {
-            $params[] = $p;
-        }
+        $params = array_merge($params, array_values($this->params));
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        
+
         return $stmt->rowCount();
     }
 
@@ -134,7 +127,7 @@ class Query
         $sql = $this->buildSelectQuery();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
-        
+
         return $stmt->fetchAll();
     }
 
@@ -145,7 +138,7 @@ class Query
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
         $row = $stmt->fetch();
-        
+
         return $row ?: null;
     }
 
@@ -165,17 +158,13 @@ class Query
         $sql .= $this->buildOrderByPart();
         $sql .= $this->buildLimitPart();
         $sql .= $this->buildOffsetPart();
-        
+
         return $sql;
     }
 
     private function buildWherePart(): string
     {
-        if (count($this->conditions) > 0) {
-            return " WHERE " . implode(" AND ", $this->conditions);
-        }
-        
-        return '';
+        return count($this->conditions) > 0 ? " WHERE " . implode(" AND ", $this->conditions) : '';
     }
 
     private function buildOrderByPart(): string

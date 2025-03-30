@@ -24,10 +24,9 @@ class Repository
     {
         $q = $this->query()->where($where);
         $rows = $q->all();
-        $modelClass = $this->modelDefinition->getModelClass();
         $models = [];
         foreach ($rows as $row) {
-            $models[] = $modelClass::fromArray($row);
+            $models[] = $this->modelDefinition->createModelFromArray($row);
         }
 
         return $models;
@@ -40,29 +39,26 @@ class Repository
         }
         $q = $this->query()->where($where)->limit(1);
         $row = $q->one();
-        $modelClass = $this->modelDefinition->getModelClass();
+        $model = $row ? $this->modelDefinition->createModelFromArray($row) : null;
 
-        return $row ? $modelClass::fromArray($row) : null;
+        return $model;
     }
 
     public function save(Model $model): bool
     {
         $data = $model->asArray();
         if ($model->isNew()) {
-            $q = $this->query();
-            $id = $q->insert($data);
+            $id = $this->query()->insert($data);
             if ($id) {
                 $model->setId((int)$id);
 
                 return true;
             }
-            return false;
-        } else {
-            $q = $this->query()->where(['id' => $model->getId()]);
-            $affected = $q->update($data);
 
-            return $affected > 0;
+            return false;
         }
+
+        return $this->query()->where(['id' => $model->getId()])->update($data) > 0;
     }
 
     public function delete(int $id): bool
