@@ -2,55 +2,34 @@
 
 namespace Org\Model;
 
-class Post
-{
-    private ?int $id;
-    private string $title;
-    private string $content;
-    private string $createdAt;
-    private string $updatedAt;
-    private string $authorName;
+use Arc\Db\Model;
 
-    public function __construct(string $title = '', string $content = '', string $authorName = 'Саша')
+class Post extends Model
+{
+    private string $title = '';
+    private string $content = '';
+    private string $createdAt = '';
+    private string $updatedAt = '';
+    private string $authorName = 'Саша';
+
+    public static function tableName(): string
     {
-        $this->id = null;
-        $this->title = $title;
-        $this->content = $content;
-        $this->authorName = $authorName;
-        $this->createdAt = date('Y-m-d H:i:s');
-        $this->updatedAt = date('Y-m-d H:i:s');
+        return 'posts';
+    }
+
+    public static function attributes(): array
+    {
+        return ['title', 'content', 'createdAt', 'updatedAt'];
     }
 
     public function validationRules(): array
     {
         return [
-            ['title' => ['required' => true]],
-            ['title' => ['string' => ['maxLength' => 255]]],
+            ['title'   => ['required' => true]],
+            ['title'   => ['string'   => ['maxLength' => 255]]],
             ['content' => ['required' => true]],
-            ['content' => ['string' => ['maxLength' => 1000]]]
+            ['content' => ['string'   => ['maxLength' => 1000]]],
         ];
-    }
-
-    public function load(array $data): bool
-    {
-        $this->changeTitle($data['title']);
-        $this->changeContent($data['content']);
-
-        return true;
-    }
-
-    public function fromDbRow(array $dbRow): void
-    {
-        $this->id = $dbRow['id'];
-        $this->title = $dbRow['title'];
-        $this->content = $dbRow['content'];
-        $this->createdAt = $dbRow['createdAt'];
-        $this->updatedAt = $dbRow['updatedAt'];
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getTitle(): string
@@ -73,20 +52,30 @@ class Post
         return $this->updatedAt;
     }
 
-    public function changeTitle(string $newTitle): void
+    public function getAuthorName(): string
+    {
+        return $this->authorName;
+    }
+
+    public function setTitle(string $newTitle): void
     {
         $this->title = $newTitle;
         $this->updatedAt = date('Y-m-d H:i:s');
     }
 
-    public function changeContent(string $newContent): void
+    public function setContent(string $newContent): void
     {
         $this->content = $newContent;
         $this->updatedAt = date('Y-m-d H:i:s');
     }
 
-    public function getAuthorName(): string
+    public function setCreatedAt(string $createdAt): void
     {
-        return $this->authorName;
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt(string $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }

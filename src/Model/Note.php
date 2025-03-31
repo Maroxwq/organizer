@@ -2,54 +2,31 @@
 
 namespace Org\Model;
 
-class Note
-{
-    private ?int $id;
-    private string $content;
-    private string $dateChanged;
-    private string $color;
+use Arc\Db\Model;
 
-    public function __construct(string $content = '', string $color = '')
+class Note extends Model
+{
+    protected string $content = '';
+    protected string $dateChanged = '';
+    protected string $color = '';
+
+    public static function tableName(): string
     {
-        $this->id = null;
-        $this->content = $content;
-        $this->color = $color;
-        $this->dateChanged = date('Y-m-d H:i:s');
+        return 'notes';
+    }
+
+    public static function attributes(): array
+    {
+        return ['content', 'dateChanged', 'color'];
     }
 
     public function validationRules()
     {
         return [
             ['content' => ['required' => true]],
-            ['content' => ['string' => ['maxLength' => 255]]],
-            ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
+            ['content' => ['string'   => ['maxLength' => 255]]],
+            ['color'   => ['regex'    => ['pattern'   => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
-    }
-
-    public function load(array $data): bool
-    {
-        $this->changeContent($data['content']);
-        $this->changeColor($data['color']);
-
-        return true;
-    }
-
-    public function fromDbRow(array $dbRow): void
-    {
-        $this->id = $dbRow['id'];
-        $this->content = $dbRow['content'];
-        $this->dateChanged = $dbRow['dateChanged'];
-        $this->color = $dbRow['color'];
-    }
-
-    public function asString(): string
-    {
-        return "$this->content, $this->dateChanged - $this->color";
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getContent(): string
@@ -67,15 +44,26 @@ class Note
         return $this->color;
     }
 
-    public function changeContent(string $newContent)
+    public function setContent(string $newContent): self
     {
         $this->content = $newContent;
         $this->dateChanged = date('Y-m-d H:i:s');
+        
+        return $this;
     }
 
-    public function changeColor(string $newColor)
+    public function setColor(string $newColor): self
     {
         $this->color = $newColor;
         $this->dateChanged = date('Y-m-d H:i:s');
+        
+        return $this;
+    }
+
+    public function setDateChanged(string $dateChanged): self
+    {
+        $this->dateChanged = $dateChanged;
+
+        return $this;
     }
 }

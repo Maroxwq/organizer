@@ -3,50 +3,43 @@
 namespace Org\Controller;
 
 use Arc\Framework\Controller;
+use Arc\Http\RedirectResponse;
+use Arc\Http\Response;
 use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
-use Arc\Http\Request;
-use Arc\View\View;
 
 class NotesController extends Controller
 {
-    private NoteRepository $repository;
-
-    public function __construct(Request $request, View $view)
-    {
-        parent::__construct($request, $view);
-        $this->repository = new NoteRepository();
-        $this->view->setLayout('layout');
-    }
-
     public function index(): string
     {
-        $notes = $this->repository->findAll();
+        $notes = $this->noteRepository()->findAll();
+
         return $this->render('notes/index', ['notes' => $notes]);
     }
 
-    public function add(): string
+    public function add(): Response|string
     {
         return $this->handleForm(new Note, 'add');
     }
 
-    public function edit(int $id): string
+    public function edit(int $id): Response|string
     {
-        return $this->handleForm($this->repository->getById($id), 'edit');
+        $note = $this->noteRepository()->findOne($id);
+
+        return $this->handleForm($note, 'edit');
     }
 
-    public function delete(int $id): string
+    public function delete(int $id): Response
     {
-        $this->repository->deleteNote($id);
-        header('Location: /notes');
-        return '';
+        $this->noteRepository()->delete($id);
+
+        return new RedirectResponse('/notes');
     }
 
     public function viewNote(int $id): string
     {
-        $note = $this->repository->getById($id);
-
+        $note = $this->noteRepository()->findOne($id);
         if ($note === null) {
             throw new \RuntimeException('Note not found for ID: ' . $id);
         }
@@ -54,19 +47,27 @@ class NotesController extends Controller
         return $this->render('notes/view', ['note' => $note]);
     }
 
-    private function handleForm(Note $note, string $templateName): string
+    private function handleForm(Note $note, string $templateName): Response|string
     {
         $errors = [];
-        if ($this->request->isPost() &&
+        if (
+            $this->request->isPost() &&
             $note->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($note))
         ) {
-            $this->repository->save($note);
-            header('Location: /notes');
+            $this->noteRepository()->save($note);
 
-            return '';
+            return new RedirectResponse('/notes');
         }
 
         return $this->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
+    }
+
+    private function noteRepository(): NoteRepository
+    {
+        /** @var NoteRepository $repo */
+        $repo = $this->repository(Note::class);
+
+        return $repo;
     }
 }

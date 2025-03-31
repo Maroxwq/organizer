@@ -2,24 +2,22 @@
 
 namespace Org\Controller;
 
-use Arc\Framework\BaseController;
-use Org\Model\User;
-use Arc\Http\Request;
-use Arc\View\View;
+use Arc\Db\Query;
+use Arc\Framework\Controller;
+use Note;
 
-class DraftController extends BaseController
+class DraftController extends Controller
 {
-    public function __construct(Request $request, View $view)
-    {
-        parent::__construct($request, $view);
-        $this->view->setLayout('layout');
-    }
-
     public function index()
     {
-        $user = new User('', '', 0);
-        $user->load($_POST);
+        session_start();
+        // $_SESSION['key1'] = 'Vasya';
 
-        return $this->view->render('draft/index');
+
+
+
+
+
+        return $this->render('draft/index');
     }
 }

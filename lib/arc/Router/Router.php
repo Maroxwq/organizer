@@ -26,11 +26,10 @@ class Router
 
                 preg_match_all('/:(\w+)/', $route, $paramNames);
                 foreach ($paramNames[1] as $index => $paramName) {
-                    $param = $matches[$index + 1];
-                    $param = is_numeric($param) ? (int) $param : $param;
-                    $params[$paramName] = $param;
+                    $paramValue = $matches[$index + 1];
+                    $params[$paramName] = is_numeric($paramValue) ? (int) $paramValue : $paramValue;
                 }
-
+                
                 return [
                     '_controller' => $parts[0],
                     '_action' => $parts[1],
@@ -40,5 +39,10 @@ class Router
         }
 
         throw new \RuntimeException('Route not found: ' . $uri);
+    }
+
+    public function url(string $route, array $params): string
+    {
+        return '';
     }
 }

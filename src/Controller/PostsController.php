@@ -3,71 +3,70 @@
 namespace Org\Controller;
 
 use Arc\Framework\Controller;
+use Arc\Http\RedirectResponse;
+use Arc\Http\Response;
 use Arc\Validator\ModelValidator;
-use Org\Repository\PostRepository;
 use Org\Model\Post;
-use Arc\Http\Request;
-use Arc\View\View;
+use Org\Repository\PostRepository;
 
 class PostsController extends Controller
 {
-    private PostRepository $repository;
-
-    public function __construct(Request $request, View $view)
-    {
-        parent::__construct($request, $view);
-        $this->repository = new PostRepository();
-        $this->view->setLayout('layout');
-    }
-
     public function index(): string
     {
-        $posts = $this->repository->findAll();
-        return $this->view->render('posts/index', ['posts' => $posts]);
+        $posts = $this->postRepository()->findAll();
+
+        return $this->render('posts/index', ['posts' => $posts]);
     }
 
-    public function viewPost(array $params): string
+    public function viewPost(int $id): string
     {
-        $id = (int)$params['id'];
-        $post = $this->repository->getById($id);
-
+        $post = $this->postRepository()->findOne($id);
         if ($post === null) {
             throw new \RuntimeException('Post not found for ID: ' . $id);
         }
-        return $this->view->render('posts/view', ['post' => $post]);
+
+        return $this->render('posts/view', ['post' => $post]);
     }
 
-    public function add(): string
+    public function add(): Response|string
     {
         return $this->handleForm(new Post, 'add');
     }
 
-    public function edit(array $params): string
+    public function edit(int $id): Response|string
     {
-        return $this->handleForm($this->repository->getById((int)$params['id']), 'edit');
+        $post = $this->postRepository()->findOne($id);
+
+        return $this->handleForm($post, 'edit');
     }
 
-    public function delete(array $params): string
+    public function delete(int $id): Response
     {
-        $this->repository->deletePost((int) $params['id']);
-        header('Location: /posts');
-        return '';
+        $this->postRepository()->delete($id);
+
+        return new RedirectResponse('/posts');
     }
 
-    private function handleForm(Post $post, string $templateName): string
+    private function handleForm(Post $post, string $templateName): Response|string
     {
         $errors = [];
-
-        if ($this->request->isPost() &&
+        if (
+            $this->request->isPost() &&
             $post->load($this->request->post()) &&
             empty($errors = (new ModelValidator())->validate($post))
         ) {
-            $this->repository->save($post);
-            header('Location: /posts');
-            
-            return '';
+            $this->postRepository()->save($post);
+
+            return new RedirectResponse('/posts');
         }
 
-        return $this->view->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
+        return $this->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
+    }
+
+    private function postRepository(): PostRepository
+    {
+        /** @var PostRepository $repo */
+        $repo = $this->repository(Post::class);
+        return $repo;
     }
 }
