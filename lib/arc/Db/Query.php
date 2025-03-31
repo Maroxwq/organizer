@@ -67,10 +67,10 @@ class Query
         $orders = [];
         foreach ($fields as $column => $direction) {
             if (is_int($column)) {
-                $orders[] = $direction . " ASC";
-            } else {
-                $orders[] = $column . " " . $direction;
+                $column = $direction;
+                $direction = 'ASC';
             }
+            $orders[] = $column . ' ' . $direction;
         }
         $this->orderBy = implode(', ', $orders);
 
@@ -99,13 +99,8 @@ class Query
         $params = array_values($values);
         $set = implode(', ', $setArr);
         $sql = sprintf('UPDATE %s SET %s', $this->from, $set);
-        $wherePart = $this->buildWherePart();
-        if ($wherePart !== '') {
-            $sql .= $wherePart;
-        }
-        if ($this->limit !== null) {
-            $sql .= " LIMIT " . $this->limit;
-        }
+        $sql .= $this->buildWherePart();
+        $sql .= $this->buildLimitPart();
         $params = array_merge($params, array_values($this->params));
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);

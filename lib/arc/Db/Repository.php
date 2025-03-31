@@ -22,8 +22,7 @@ class Repository
 
     public function findBy(array $where): array
     {
-        $q = $this->query()->where($where);
-        $rows = $q->all();
+        $rows = $this->query()->where($where)->all();
         $models = [];
         foreach ($rows as $row) {
             $models[] = $this->modelDefinition->createModelFromArray($row);
@@ -37,11 +36,9 @@ class Repository
         if (is_int($where)) {
             $where = ['id' => $where];
         }
-        $q = $this->query()->where($where)->limit(1);
-        $row = $q->one();
-        $model = $row ? $this->modelDefinition->createModelFromArray($row) : null;
+        $row = $this->query()->where($where)->limit(1)->one();
 
-        return $model;
+        return $row ? $this->modelDefinition->createModelFromArray($row) : null;
     }
 
     public function save(Model $model): bool

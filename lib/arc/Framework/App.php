@@ -5,13 +5,12 @@ namespace Arc\Framework;
 use Arc\Db\DbManager;
 use Arc\Router\Router;
 use Arc\Http\Request;
+use Arc\Http\Response;
 use Arc\View\View;
 
 class App
 {
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     public function run()
     {
@@ -26,13 +25,12 @@ class App
             $controller = new $controllerClass($request, $view, $dbManager);
             $method = $request->attributes('_action');
             $params = $request->attributes('_params');
-            echo $controller->$method(...$params);
-            // /** @var Response|string $response */
-            // $response = $controller->$method(...$params);
-            // if (is_string($response)) {
-            //     $response = new Response($response);
-            // }
-            // $response->send();
+            /** @var Response|string $response */
+            $response = $controller->$method(...$params);
+            if (is_string($response)) {
+                $response = new Response($response);
+            }
+            $response->send();
         } catch (\Throwable $exception) {
             echo '<h1>' . $exception->getMessage() . '</h1>';
             echo nl2br($exception->getTraceAsString()), '<br>';

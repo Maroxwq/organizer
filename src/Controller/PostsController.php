@@ -3,6 +3,8 @@
 namespace Org\Controller;
 
 use Arc\Framework\Controller;
+use Arc\Http\RedirectResponse;
+use Arc\Http\Response;
 use Arc\Validator\ModelValidator;
 use Org\Model\Post;
 use Org\Repository\PostRepository;
@@ -26,26 +28,26 @@ class PostsController extends Controller
         return $this->render('posts/view', ['post' => $post]);
     }
 
-    public function add(): string
+    public function add(): Response|string
     {
         return $this->handleForm(new Post, 'add');
     }
 
-    public function edit(int $id): string
+    public function edit(int $id): Response|string
     {
         $post = $this->postRepository()->findOne($id);
 
         return $this->handleForm($post, 'edit');
     }
 
-    public function delete(int $id): string
+    public function delete(int $id): Response
     {
         $this->postRepository()->delete($id);
-        header('Location: /posts');
-        return '';
+
+        return new RedirectResponse('/posts');
     }
 
-    private function handleForm(Post $post, string $templateName): string
+    private function handleForm(Post $post, string $templateName): Response|string
     {
         $errors = [];
         if (
@@ -54,9 +56,8 @@ class PostsController extends Controller
             empty($errors = (new ModelValidator())->validate($post))
         ) {
             $this->postRepository()->save($post);
-            header('Location: /posts');
 
-            return '';
+            return new RedirectResponse('/posts');
         }
 
         return $this->render('posts/' . $templateName, ['errors' => $errors, 'post' => $post]);
@@ -66,7 +67,6 @@ class PostsController extends Controller
     {
         /** @var PostRepository $repo */
         $repo = $this->repository(Post::class);
-
         return $repo;
     }
 }
