@@ -1,4 +1,4 @@
 .idea
 /data
 /src/Controller/DraftController.php
-/template/draft
+/templates/draft
