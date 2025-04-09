@@ -4,7 +4,9 @@ namespace Arc\Http;
 
 class Response
 {
-    public function __construct(private string $content, private array $headers = []) {}
+    private int $statusCode = 200;
+
+    public function __construct(private string $content = '', private array $headers = []) {}
 
     public function setContent(string $content): self
     {
@@ -29,10 +31,18 @@ class Response
 
     public function send(): self
     {
+        http_response_code($this->statusCode);
         foreach ($this->headers as $name => $value) {
             header("{$name}: {$value}");
         }
         echo $this->content;
+
+        return $this;
+    }
+
+    public function setStatusCode(int $code): self
+    {
+        $this->statusCode = $code;
 
         return $this;
     }

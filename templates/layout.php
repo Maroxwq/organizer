@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link rel="stylesheet" href="/css/newStyle.css"> -->
     <link rel="stylesheet" href="/css/bootstrap.css">
-    <title><?=$title ?? 'Organizer'?></title>
+    <title><?= $title ?? 'Organizer' ?></title>
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
@@ -18,7 +18,11 @@
                 <a href="/posts" class="nav-link active text-dark pb-0 fs-5">Forum</a>
             </div>
 
-            <a href="/login" class="btn btn-dark ms-auto" style="width: 100px;">Login</a>
+            <?php if ($this->session() && $this->session()->has('user_id')): ?>
+                <a href="/logout" class="btn btn-dark ms-auto" style="width: 100px;">Logout</a>
+            <?php else: ?>
+                <a href="/login" class="btn btn-dark ms-auto" style="width: 100px;">Login</a>
+            <?php endif; ?>
         </div>
     </nav>
     <div class="container">

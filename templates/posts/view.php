@@ -1,9 +1,9 @@
 <?php
-use Arc\View\View;
-/** @var View $this */
-/** @var \Org\Model\Post $post */
+// use Arc\View\View;
+// /** @var View $this */
+// /** @var \Org\Model\Post $post */
 
-$this->extends('layout');
+// $this->extends('layout');
 ?>
 
 <div class="container mt-4 bg-light p-3">

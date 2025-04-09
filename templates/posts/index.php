@@ -1,9 +1,9 @@
 <?php
-use Arc\View\View;
-/** @var View $this */
-/** @var \Org\Model\Post[] $posts */
+// use Arc\View\View;
+// /** @var View $this */
+// /** @var \Org\Model\Post[] $posts */
 
-$this->extends('layout');
+// $this->extends('layout');
 ?>
 
 <div class="text-center">

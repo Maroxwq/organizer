@@ -1,14 +1,19 @@
 <?php
 
-use Org\Core\View;
+// use Org\Core\View;
 
-/** @var View $this */
-$this->extends('layout');
+// /** @var View $this */
+// $this->extends('layout');
 ?>
 
 <div class="text-center">
     <a href="/notes/add" class="btn btn-primary btn-lg mb-3 mt-4">Добавить заметку</a>
 </div>
+<?php if ($success = $this->session()->getFlash('success')): ?>
+  <div class="alert alert-success" role="alert">
+    <?= htmlspecialchars($success) ?>
+  </div>
+<?php endif; ?>
 <div class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
     <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">

@@ -7,10 +7,13 @@ class StringValidator implements ValidatorInterface
     public function validate(mixed $value, array $options = []): true | array
     {
         if (!is_string($value)) {
-            return ['Поле должно быть строкой'];
+            return [$value . 'field must be a string'];
         }
         if (isset($options['maxLength']) && strlen($value) > $options['maxLength']) {
-            return ['Максимальная длина: ' . $options['maxLength']];
+            return ['Maximum length: ' . $options['maxLength']];
+        }
+        if (isset($options['minLength']) && strlen($value) < $options['minLength']) {
+            return ['Minimum length: ' . $options['minLength']];
         }
         
         return true;

@@ -30,4 +30,9 @@ class Config
     {
         return $this->config['db'];
     }
+
+    public function security(): array
+    {
+        return $this->config['security'];
+    }
 }

@@ -2,10 +2,13 @@
 
 namespace Arc\View;
 
+use Arc\Http\Session;
+
 class View
 {
     private string $basePath;
     private ?string $layout;
+    private ?Session $session = null;
 
     public function __construct(string $basePath)
     {
@@ -15,6 +18,16 @@ class View
     public function setLayout(?string $layout)
     {
         $this->layout = $layout;
+    }
+
+    public function setSession(Session $session): void
+    {
+        $this->session = $session;
+    }
+
+    public function session(): ?Session
+    {
+        return $this->session;
     }
 
     public function renderPartial(string $templatePath, array $params = []): string
@@ -31,7 +44,7 @@ class View
     public function render(string $templatePath, array $params = []): string
     {
         $rendered = $this->renderPartial($templatePath, $params);
-        
+
         if ($this->layout) {
             return $this->renderPartial($this->layout, ['content' => $rendered]);
         }
@@ -39,8 +52,8 @@ class View
         return $rendered;
     }
 
-    public function extends(string $layoutPath): void
-    {
-        
-    }
+    // public function extends(string $layoutPath): void
+    // {
+    
+    // }
 }
