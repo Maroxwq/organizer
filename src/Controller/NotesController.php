@@ -56,7 +56,7 @@ class NotesController extends Controller
             empty($errors = (new ModelValidator())->validate($note))
         ) {
             $this->noteRepository()->save($note);
-            $this->view->session()->setFlash('success', 'Note by id ' . $note->getId() . ' saved');
+            $this->view->session()->setFlash('success', 'Note is successfully saved!');
 
             return new RedirectResponse('/notes');
         }

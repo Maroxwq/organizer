@@ -2,16 +2,17 @@
 
 namespace Arc\Http;
 
-class Session {
+class Session
+{
     public function __construct()
     {
         session_start();
     }
 
-    // public function __destruct()
-    // {
-    //     session_destroy();
-    // }
+    public function __destruct()
+    {
+        session_write_close();
+    }
 
     public function set(string $key, string $value): self
     {
@@ -37,6 +38,9 @@ class Session {
 
     public function setFlash(string $key, string $value): self
     {
+        if (!isset($_SESSION['flash_messages'])) {
+            $_SESSION['flash_messages'] = [];
+        }
         $_SESSION['flash_messages'][$key] = $value;
 
         return $this;

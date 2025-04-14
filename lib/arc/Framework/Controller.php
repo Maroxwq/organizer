@@ -32,18 +32,28 @@ class Controller
         return $this->dbManager->getRepository($modelClass);
     }
 
-    public function before(): bool|Response {
+    public function before(): bool|Response
+    {
+        $currentUri = $this->request->requestUri();
+        $security = $this->config->security();
         if ($this->webUser->isAuthenticated()) {
             return true;
         }
-        $currentUri = $this->request->requestUri();
-        $security = $this->config->security();
-        $publicUrls = $security['public_urls'] ?? [];
+
+        $publicUrls = $security['public_urls'];
         foreach ($publicUrls as $pattern) {
             if (preg_match($pattern, $currentUri)) {
                 return true;
             }
         }
+
+        $privateUrls = $security['private_urls'];
+        foreach ($privateUrls as $pattern) {
+            if (preg_match($pattern, $currentUri)) {
+                return new RedirectResponse($security['login_url']);
+            }
+        }
+
         return new RedirectResponse($security['login_url']);
     }
 }

@@ -5,7 +5,8 @@ namespace Org\Model;
 use Arc\Db\Model;
 use Arc\Security\IdentityInterface;
 
-class User extends Model implements IdentityInterface {
+class User extends Model implements IdentityInterface
+{
     private string $email = "";
     private string $name = "";
     protected string $passwordHash = "";
@@ -36,6 +37,7 @@ class User extends Model implements IdentityInterface {
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -47,18 +49,27 @@ class User extends Model implements IdentityInterface {
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
-    public function getPasswordHash(): string {
-        return $this->passwordHash;
-    }
-
-    public function setPasswordHash(string $password): self
+    public function setPasswordPlain(string $password): self
     {
-        $this->passwordHash = strlen($password) === 40 ? $password : sha1($password);
+        $this->passwordHash = sha1($password);
 
         return $this;
+    }
+
+    public function setPasswordHash(string $hash): self
+    {
+        $this->passwordHash = $hash;
+
+        return $this;
+    }
+
+    public function getPasswordHash(): string
+    {
+        return $this->passwordHash;
     }
 
     public function checkPassword(string $password): bool

@@ -12,9 +12,7 @@ use Arc\Security\WebUser;
 
 class App
 {
-    public function __construct(private array $config)
-    {
-    }
+    public function __construct(private array $config) {}
 
     public function run(): void
     {
@@ -26,10 +24,13 @@ class App
             $view = new View($config->basePath() . '/templates/');
             $view->setSession($session);
             $dbManager = new DbManager($config->db());
-            $userRepository = $dbManager->getRepository(\Org\Model\User::class);
+            $securityConfig = $config->security();
+            $userClass = $securityConfig['user_class'];
+            $userRepository = $dbManager->getRepository($userClass);
             $webUser = new WebUser($session, $userRepository);
             $router->resolveRequest($request);
-            $controllerClass = $config->namespacePrefix() . 'Controller\\' . ucfirst($request->attributes('_controller')) . 'Controller';
+            $controllerName = ucfirst($request->attributes('_controller'));
+            $controllerClass = $config->namespacePrefix() . 'Controller\\' . $controllerName . 'Controller';
             /** @var Controller $controller */
             $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config);
             $method = $request->attributes('_action');
@@ -37,6 +38,7 @@ class App
             $beforeResult = $controller->before();
             if ($beforeResult instanceof Response) {
                 $beforeResult->send();
+
                 return;
             }
             $response = $controller->$method(...$params);
