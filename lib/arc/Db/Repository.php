@@ -5,7 +5,7 @@ namespace Arc\Db;
 class Repository
 {
     public function __construct(
-        private \PDO $pdo, 
+        private \PDO $pdo,
         private ModelDefinition $modelDefinition
     ) {}
 
@@ -27,7 +27,6 @@ class Repository
         foreach ($rows as $row) {
             $models[] = $this->modelDefinition->createModelFromArray($row);
         }
-
         return $models;
     }
 
@@ -37,7 +36,6 @@ class Repository
             $where = ['id' => $where];
         }
         $row = $this->query()->where($where)->limit(1)->one();
-
         return $row ? $this->modelDefinition->createModelFromArray($row) : null;
     }
 
@@ -46,13 +44,8 @@ class Repository
         $data = $model->asArray();
         if ($model->isNew()) {
             $id = $this->query()->insert($data);
-            if ($id) {
-                $model->setId((int)$id);
-
-                return true;
-            }
-
-            return false;
+            $model->setId($id);
+            return true;
         }
 
         return $this->query()->where(['id' => $model->getId()])->update($data) > 0;

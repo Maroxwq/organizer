@@ -2,52 +2,83 @@
 
 namespace Org\Model;
 
-class User
-{
-    private int $id;
-    private string $firstName;
-    private string $lastName;
-    private int $age;
+use Arc\Db\Model;
+use Arc\Security\IdentityInterface;
 
-    public function __construct(string $firstName, string $lastName, int $age)
+class User extends Model implements IdentityInterface
+{
+    private string $email = "";
+    private string $name = "";
+    protected string $passwordHash = "";
+
+    public static function tableName(): string
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->age = $age;
+        return 'users';
+    }
+
+    public static function attributes(): array
+    {
+        return ['email', 'name', 'passwordHash'];
     }
 
     public function validationRules(): array
     {
         return [
-            ['firstName' => ['required' => true]],
-            ['firstName' => ['string' => ['maxLength' => 100, 'minLength' => 3]]],
-            ['lastName' => ['string' => ['maxLength' => 100, 'minLength' => 3]]],
-            ['age' => ['int' => ['max' => 100, 'min' => 12]]],
+            ['email' => ['required' => true]],
+            ['email' => ['string' => ['minLength' => 10, 'maxLength' => 50]]],
         ];
     }
 
-    public function load(): void
+    public function getEmail(): string
     {
-        
+        return $this->email;
     }
 
-    public function getId(): int
+    public function setEmail(string $email): self
     {
-        return $this->id;
+        $this->email = $email;
+
+        return $this;
     }
 
-    public function getFirstName(): string
+    public function getName(): string
     {
-        return $this->firstName;
+        return $this->name;
     }
 
-    public function getLastName(): string
+    public function setName(string $name): self
     {
-        return $this->lastName;
+        $this->name = $name;
+
+        return $this;
     }
 
-    public function getAge(): int
+    public function setPasswordPlain(string $password): self
     {
-        return $this->age;
+        $this->passwordHash = sha1($password);
+
+        return $this;
+    }
+
+    public function setPasswordHash(string $hash): self
+    {
+        $this->passwordHash = $hash;
+
+        return $this;
+    }
+
+    public function getPasswordHash(): string
+    {
+        return $this->passwordHash;
+    }
+
+    public function checkPassword(string $password): bool
+    {
+        return $this->passwordHash === sha1($password);
+    }
+
+    public function getUserId(): string
+    {
+        return (string) parent::getId();
     }
 }

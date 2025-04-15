@@ -12,9 +12,7 @@ class Query
     private ?int $offset = null;
     private ?string $orderBy = null;
 
-    public function __construct(private \PDO $pdo)
-    {
-    }
+    public function __construct(private \PDO $pdo) {}
 
     public function select(array|string $fields = '*'): self
     {
@@ -82,15 +80,19 @@ class Query
         if (empty($values)) {
             throw new \InvalidArgumentException("Values array cannot be empty");
         }
-        
+
         $columns = implode(', ', array_keys($values));
         $placeholders = implode(', ', array_fill(0, count($values), '?'));
         $params = array_values($values);
         $sql = sprintf('INSERT INTO %s (%s) VALUES (%s)', $this->from, $columns, $placeholders);
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        $lastId = $this->pdo->lastInsertId();
+        if (!$lastId) {
+            throw new \RuntimeException('Could not get lastInsertId after insert');
+        }
 
-        return (int) $this->pdo->lastInsertId();
+        return (int) $lastId;
     }
 
     public function update(array $values): int
@@ -99,8 +101,8 @@ class Query
         $params = array_values($values);
         $set = implode(', ', $setArr);
         $sql = sprintf('UPDATE %s SET %s', $this->from, $set);
-        $sql .= $this->buildWherePart();
-        $sql .= $this->buildLimitPart();
+        $sql .= $this->buildWhere();
+        $sql .= $this->buildLimit();
         $params = array_merge($params, array_values($this->params));
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
@@ -110,7 +112,7 @@ class Query
 
     public function delete(): int
     {
-        $sql = "DELETE FROM " . $this->from . $this->buildWherePart();
+        $sql = "DELETE FROM " . $this->from . $this->buildWhere();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
 
@@ -139,7 +141,7 @@ class Query
 
     public function count(): int
     {
-        $sql = "SELECT COUNT(*) FROM " . $this->from . $this->buildWherePart();
+        $sql = "SELECT COUNT(*) FROM " . $this->from . $this->buildWhere();
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($this->params);
 
@@ -149,30 +151,30 @@ class Query
     private function buildSelectQuery(): string
     {
         $sql = "SELECT " . $this->select . " FROM " . $this->from;
-        $sql .= $this->buildWherePart();
-        $sql .= $this->buildOrderByPart();
-        $sql .= $this->buildLimitPart();
-        $sql .= $this->buildOffsetPart();
+        $sql .= $this->buildWhere();
+        $sql .= $this->buildOrderBy();
+        $sql .= $this->buildLimit();
+        $sql .= $this->buildOffset();
 
         return $sql;
     }
 
-    private function buildWherePart(): string
+    private function buildWhere(): string
     {
         return count($this->conditions) > 0 ? " WHERE " . implode(" AND ", $this->conditions) : '';
     }
 
-    private function buildOrderByPart(): string
+    private function buildOrderBy(): string
     {
         return $this->orderBy !== null ? " ORDER BY " . $this->orderBy : '';
     }
 
-    private function buildLimitPart(): string
+    private function buildLimit(): string
     {
         return $this->limit !== null ? " LIMIT " . $this->limit : '';
     }
 
-    private function buildOffsetPart(): string
+    private function buildOffset(): string
     {
         return $this->offset !== null ? " OFFSET " . $this->offset : '';
     }
