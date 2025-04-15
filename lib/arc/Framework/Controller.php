@@ -54,6 +54,6 @@ class Controller
             }
         }
 
-        return new RedirectResponse($security['login_url']);
+        return true;
     }
 }
