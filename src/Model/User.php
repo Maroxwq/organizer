@@ -9,7 +9,8 @@ class User extends Model implements IdentityInterface
 {
     private string $email = "";
     private string $name = "";
-    protected string $passwordHash = "";
+    private string $passwordHash = "";
+    private string $passwordPlain = "";
 
     public static function tableName(): string
     {
@@ -26,6 +27,7 @@ class User extends Model implements IdentityInterface
         return [
             ['email' => ['required' => true]],
             ['email' => ['string' => ['minLength' => 10, 'maxLength' => 50]]],
+            ['passwordPlain' => ['password' => ['minLength' => 6]]],
         ];
     }
 
@@ -43,7 +45,7 @@ class User extends Model implements IdentityInterface
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->name ?: $this->email;
     }
 
     public function setName(string $name): self
@@ -55,6 +57,7 @@ class User extends Model implements IdentityInterface
 
     public function setPasswordPlain(string $password): self
     {
+        $this->passwordPlain = $password;
         $this->passwordHash = sha1($password);
 
         return $this;
@@ -70,6 +73,11 @@ class User extends Model implements IdentityInterface
     public function getPasswordHash(): string
     {
         return $this->passwordHash;
+    }
+
+    public function getPasswordPlain(): string
+    {
+        return $this->passwordPlain;
     }
 
     public function checkPassword(string $password): bool

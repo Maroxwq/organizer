@@ -3,9 +3,7 @@
 namespace Org\Controller;
 
 use Arc\Framework\Controller;
-use Arc\Http\RedirectResponse;
 use Arc\Http\Response;
-use Arc\Validator\ModelValidator;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
 
@@ -13,14 +11,21 @@ class NotesController extends Controller
 {
     public function index(): string
     {
-        $notes = $this->noteRepository()->findAll();
+        $userId = $this->webUser->getIdentity()->getUserId();
+        $notes  = $this->repository(Note::class)->findBy(['userId' => $userId]);
 
-        return $this->render('notes/index', ['notes' => $notes]);
+        return $this->render('notes/index', [
+            'notes' => $notes,
+            'message' => $this->view->session()->getFlash('success') ?: null,
+        ]);
     }
 
     public function add(): Response|string
     {
-        return $this->handleForm(new Note, 'add');
+        $note = new Note();
+        $note->setUserId($this->webUser->getIdentity()->getUserId());
+
+        return $this->handleForm($note, 'add');
     }
 
     public function edit(int $id): Response|string
@@ -34,7 +39,7 @@ class NotesController extends Controller
     {
         $this->noteRepository()->delete($id);
 
-        return new RedirectResponse('/notes');
+        return $this->redirect('/notes');
     }
 
     public function viewNote(int $id): string
@@ -53,12 +58,12 @@ class NotesController extends Controller
         if (
             $this->request->isPost() &&
             $note->load($this->request->post()) &&
-            empty($errors = (new ModelValidator())->validate($note))
+            $note->isValid()
         ) {
             $this->noteRepository()->save($note);
             $this->view->session()->setFlash('success', 'Note is successfully saved!');
 
-            return new RedirectResponse('/notes');
+            return $this->redirect('/notes');
         }
 
         return $this->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);

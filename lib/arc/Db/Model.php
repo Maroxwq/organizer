@@ -2,12 +2,16 @@
 
 namespace Arc\Db;
 
+use Arc\Validator\ChainValidator;
+
 abstract class Model
 {
     private ?int $id = null;
+    private array $errors = [];
 
     abstract public static function tableName(): string;
     abstract public static function attributes(): array;
+    abstract public function validationRules(): array;
 
     public function getId(): ?int
     {
@@ -57,6 +61,24 @@ abstract class Model
         }
         
         return $data;
+    }
+
+    public function isValid(): bool
+    {
+        $validator = new ChainValidator();
+        $this->errors = $validator->validate($this);
+
+        return empty($this->errors);
+    }
+
+    public function getError(string $field): string|null
+    {
+        return $this->errors[$field];
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     public static function fromArray(array $data): static

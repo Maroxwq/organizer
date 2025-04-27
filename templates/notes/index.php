@@ -1,9 +1,11 @@
 <?php
 
-// use Org\Core\View;
+use Org\Core\View;
+use Org\Models\Note;
 
-// /** @var View $this */
-// $this->extends('layout');
+/** @var View $this */
+/** @var Note[] $notes */
+$this->setGlobalVar('title', 'Organizer - Notes');
 ?>
 
 <div class="text-center">
@@ -27,7 +29,7 @@
                 <input type="hidden" name="id" value="<?= $note->getId() ?>">
                 <button type="submit" class="btn btn-danger">Удалить</button>
             </form>
-            <a href="/notes/edit/<?= $note->getId() ?>" class="btn btn-primary">Изменить</a>
+            <a href="/notes/edit/<?= $note->getId() ?>" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
             </div>
         </div>
     </a>

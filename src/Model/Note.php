@@ -6,9 +6,10 @@ use Arc\Db\Model;
 
 class Note extends Model
 {
-    protected string $content = '';
-    protected string $dateChanged = '';
-    protected string $color = '';
+    private string $userId = '';
+    private string $content = '';
+    private string $dateChanged = '';
+    private string $color = '';
 
     public static function tableName(): string
     {
@@ -17,15 +18,16 @@ class Note extends Model
 
     public static function attributes(): array
     {
-        return ['content', 'dateChanged', 'color'];
+        return ['userId', 'content', 'dateChanged', 'color'];
     }
 
-    public function validationRules()
+    public function validationRules(): array
     {
         return [
             ['content' => ['required' => true]],
-            ['content' => ['string'   => ['maxLength' => 255]]],
-            ['color'   => ['regex'    => ['pattern'   => '/^#[A-Fa-f0-9]{6}$/']]],
+            ['content' => ['string' => ['maxLength' => 255]]],
+            ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
+            ['userId'  => ['required' => true]],
         ];
     }
 
@@ -65,5 +67,17 @@ class Note extends Model
         $this->dateChanged = $dateChanged;
 
         return $this;
+    }
+
+    public function setUserId(int|string $userId): self
+    {
+        $this->userId = (string) $userId;
+
+        return $this;
+    }
+
+    public function getUserId(): string
+    {
+        return $this->userId;
     }
 }

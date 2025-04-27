@@ -9,6 +9,7 @@ use Arc\Http\Request;
 use Arc\Http\Response;
 use Arc\Security\WebUser;
 use Arc\View\View;
+use Arc\Router\Router;
 
 class Controller
 {
@@ -18,6 +19,7 @@ class Controller
         protected DbManager $dbManager,
         protected WebUser $webUser,
         protected Config $config,
+        protected Router $router,
     ) {
         $this->view->setLayout('layout');
     }
@@ -55,5 +57,15 @@ class Controller
         }
 
         return true;
+    }
+
+    public function url(string $route, array $params = []): string
+    {
+        return $this->router->url($route, $params);
+    }
+
+    public function redirect(string $route, array $params = [], int $status = 302): RedirectResponse
+    {
+        return new RedirectResponse($this->url($route, $params), $status);
     }
 }

@@ -17,7 +17,7 @@ class WebUser {
     public function getIdentity(): ?IdentityInterface
     {
         if ($this->isAuthenticated()) {
-            return $this->userRepository->findOne($this->session->get('user_id'));
+            return $this->userRepository->findOne((int) $this->session->get('user_id'));
         }
 
         return null;

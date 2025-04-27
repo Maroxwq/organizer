@@ -1,12 +1,7 @@
-<div class="errors">
-    <ul>
-        <?php foreach ($errors as $fieldErrors): ?>
-            <?php foreach ($fieldErrors as $error): ?>
-                <li class="text-danger"><?= $error ?></li>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
-    </ul>
-</div>
+<?php if ($msg = $note->getError('content')): ?>
+  <div class="alert alert-danger"><?= htmlspecialchars($msg) ?></div>
+<?php endif; ?>
+
 <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
     <div class="card shadow-lg p-4 rounded" style="width: 400px;">
         <h2 class="text-center mb-4">Редактировать заметку</h2>
