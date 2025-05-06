@@ -23,7 +23,7 @@ class NotesController extends Controller
     public function add(): Response|string
     {
         $note = new Note();
-        $note->setUserId($this->webUser->getIdentity()->getUserId());
+        $note->setUserId((int) $this->webUser->getIdentity()->getUserId());
 
         return $this->handleForm($note, 'add');
     }
@@ -39,7 +39,7 @@ class NotesController extends Controller
     {
         $this->noteRepository()->delete($id);
 
-        return $this->redirect('/notes');
+        return $this->redirectToRoute('/notes');
     }
 
     public function viewNote(int $id): string

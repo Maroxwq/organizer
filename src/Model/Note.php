@@ -6,7 +6,7 @@ use Arc\Db\Model;
 
 class Note extends Model
 {
-    private string $userId = '';
+    private ?int $userId = null;
     private string $content = '';
     private string $dateChanged = '';
     private string $color = '';
@@ -18,7 +18,7 @@ class Note extends Model
 
     public static function attributes(): array
     {
-        return ['userId', 'content', 'dateChanged', 'color'];
+        return ['userId', 'content', 'color', 'dateChanged'];
     }
 
     public function validationRules(): array
@@ -26,8 +26,7 @@ class Note extends Model
         return [
             ['content' => ['required' => true]],
             ['content' => ['string' => ['maxLength' => 255]]],
-            ['color' => ['regex' => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
-            ['userId'  => ['required' => true]],
+            ['color' => ['regex'  => ['pattern' => '/^#[A-Fa-f0-9]{6}$/']]],
         ];
     }
 
@@ -50,7 +49,7 @@ class Note extends Model
     {
         $this->content = $newContent;
         $this->dateChanged = date('Y-m-d H:i:s');
-        
+
         return $this;
     }
 
@@ -58,7 +57,7 @@ class Note extends Model
     {
         $this->color = $newColor;
         $this->dateChanged = date('Y-m-d H:i:s');
-        
+
         return $this;
     }
 
@@ -69,14 +68,14 @@ class Note extends Model
         return $this;
     }
 
-    public function setUserId(int|string $userId): self
+    public function setUserId(int $userId): self
     {
-        $this->userId = (string) $userId;
+        $this->userId = $userId;
 
         return $this;
     }
 
-    public function getUserId(): string
+    public function getUserId(): ?int
     {
         return $this->userId;
     }

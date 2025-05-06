@@ -64,8 +64,13 @@ class Controller
         return $this->router->url($route, $params);
     }
 
-    public function redirect(string $route, array $params = [], int $status = 302): RedirectResponse
+    public function redirect(string $url, int $status = 302): RedirectResponse
     {
-        return new RedirectResponse($this->url($route, $params), $status);
+        return new RedirectResponse($url, $status);
+    }
+
+    public function redirectToRoute(string $route, array $params = [], int $status = 302): RedirectResponse
+    {
+        return $this->redirect($this->url($route, $params), $status);
     }
 }

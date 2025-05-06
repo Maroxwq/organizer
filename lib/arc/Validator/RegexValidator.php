@@ -7,9 +7,9 @@ class RegexValidator implements ValidatorInterface
     public function validate(mixed $value, array $options = []): true|array
     {
         if (!isset($options['pattern']) || !is_string($options['pattern'])) {
-            return ['Invalid value'];
+            return ['Value does not match the regex pattern'];
         }
 
-        return preg_match($options['pattern'], $value) ? true : ['Invalid value'];
+        return preg_match($options['pattern'], $value) ? true : ['Value does not match the regex pattern'];
     }
 }
