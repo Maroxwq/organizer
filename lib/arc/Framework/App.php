@@ -21,30 +21,25 @@ class App
             $session = new Session();
             $router = new Router($config->routes());
             $request = Request::createFromGlobals();
-            $view = new View($config->basePath() . '/templates/');
-            $view->setSession($session);
-            $dbManager = new DbManager($config->db());
-            $securityConfig = $config->security();
-            $userClass = $securityConfig['user_class'];
-            $userRepository = $dbManager->getRepository($userClass);
-            $webUser = new WebUser($session, $userRepository);
+            $view = new View($config->basePath() . '/templates/', $session, $router, new WebUser($session, (new DbManager($config->db()))->getRepository($config->security()['user_class'])));
+            $dbManager  = new DbManager($config->db());
+            $webUser = new WebUser($session, $dbManager->getRepository($config->security()['user_class']));
             $router->resolveRequest($request);
-            $controllerName = ucfirst($request->attributes('_controller'));
+            $controllerName  = ucfirst($request->attributes('_controller'));
             $controllerClass = $config->namespacePrefix() . 'Controller\\' . $controllerName . 'Controller';
             /** @var Controller $controller */
-            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config);
-            $method = $request->attributes('_action');
-            $params = $request->attributes('_params');
-            $beforeResult = $controller->before();
-            if ($beforeResult instanceof Response) {
-                $beforeResult->send();
+            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config, $router);
+            $before = $controller->before();
+            if ($before instanceof Response) {
+                $before->send();
 
                 return;
             }
-            $response = $controller->$method(...$params);
+            $response = $controller->{$request->attributes('_action')}( ...$request->attributes('_params') );
             if (is_string($response)) {
                 $response = new Response($response);
             }
+            
             $response->send();
         } catch (\Throwable $exception) {
             echo '<h1>' . $exception->getMessage() . '</h1>';

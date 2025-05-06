@@ -41,8 +41,17 @@ class Router
         throw new \RuntimeException('Route not found: ' . $uri);
     }
 
-    public function url(string $route, array $params): string
+    public function url(string $route, array $params = []): string
     {
-        return '';
+        if (!isset($this->routes[$route])) {
+            throw new \RuntimeException("Route not found: {$route}");
+        }
+
+        $url = $route;
+        foreach ($params as $key => $value) {
+            $url = preg_replace('/:' . preg_quote($key, '/') . '\\b/', (string) $value, $url);
+        }
+
+        return $url;
     }
 }

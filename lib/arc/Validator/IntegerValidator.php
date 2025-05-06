@@ -7,7 +7,7 @@ class IntegerValidator implements ValidatorInterface
     public function validate(mixed $value, array $options = []): true | array
     {
         if (!is_int($value)) {
-            return ['Значение должно быть числовым'];
+            return ['Must be an integer'];
         }
 
         return true;
