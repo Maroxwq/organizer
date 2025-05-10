@@ -43,11 +43,12 @@ class Router
 
     public function url(string $route, array $params = []): string
     {
-        if (!isset($this->routes[$route])) {
+        $pattern = array_search($route, $this->routes, true);
+        if ($pattern === false) {
             throw new \RuntimeException("Route not found: {$route}");
         }
 
-        $url = $route;
+        $url = $pattern;
         foreach ($params as $key => $value) {
             $url = preg_replace('/:' . preg_quote($key, '/') . '\\b/', (string) $value, $url);
         }

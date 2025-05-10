@@ -2,28 +2,26 @@
 
 namespace Arc\Validator;
 
-use Arc\Db\Model;
-
-class ChainValidator
+class ObjectValidator
 {
-    public function validate(Model $model): array
+    public function __construct(private ValidatorFactory $factory) {}
+
+    public function validate(ValidatableInterface $obj): array
     {
         $errors = [];
         $factory = new ValidatorFactory();
-        foreach ($model->validationRules() as $ruleSet) {
+        foreach ($obj->validationRules() as $ruleSet) {
             foreach ($ruleSet as $field => $validations) {
                 $getter = 'get' . ucfirst($field);
-                if (!method_exists($model, $getter)) {
+                if (!method_exists($obj, $getter)) {
                     throw new \RuntimeException("Getter {$getter} not found");
                 }
-                $value = $model->$getter();
-
+                $value = $obj->$getter();
                 foreach ($validations as $type => $options) {
                     $validator = $factory->create($type);
-                    $opts = is_array($options) ? $options : [];
-                    $result = $validator->validate($value, $opts);
+                    $result = $validator->validate($value, is_array($options) ? $options : []);
                     if ($result !== true) {
-                        $errors[$field] = is_array($result) ? implode(' ', $result) : $result;
+                        $obj->addError($field, array_shift($result));
                     }
                 }
             }

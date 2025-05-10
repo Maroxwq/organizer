@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Arc\\": "lib/arc/",
+            "Org\\": "src/"
+        }
+    },
+    "require": {
+        "symfony/property-access": "^7.2"
+    }
+}

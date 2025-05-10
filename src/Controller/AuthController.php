@@ -17,56 +17,58 @@ class AuthController extends Controller
         return parent::before();
     }
 
+
     public function login(): Response|string
     {
-        $errors = [];
-        $email = '';
+        $user = new User();
         if ($this->request->isPost()) {
-            $email = trim($this->request->post('email'));
-            $password = trim($this->request->post('password'));
-            $user = $this->findUserByEmail($email);
-            if (!$user || !$user->checkPassword($password)) {
-                $errors[] = 'Invalid email or password';
-            } else {
-                $this->webUser->login($user);
+            $user->load($this->request->post());
+            if ($pass = $this->request->post('password')) {
+                $user->setPasswordPlain(trim($pass));
+            }
+            if ($user->isValid()) {
+                $found = $this->findUserByEmail($user->getEmail());
+                if ($found && $found->checkPassword($user->getPasswordPlain())) {
+                    $this->webUser->login($found);
 
-                return $this->redirectToRoute('/about');
+                    return $this->redirect($this->url('about/index'));
+                }
+                $user->addError('email', 'Invalid email or password');
             }
         }
 
-        return $this->render('auth/login', ['errors' => $errors, 'email' => $email]);
+        return $this->render('auth/login', ['user' => $user]);
     }
 
     public function register(): Response|string
     {
-        $errors = [];
-        $user   = new User();
+        $user = new User();
         if ($this->request->isPost()) {
-            $data = ['email' => trim($this->request->post('email')), 'name' => trim($this->request->post('email'))];
-            $password = trim($this->request->post('password'));
-            $user->setPasswordPlain($password);
-            if ($user->load($data) && $user->isValid()) {
+            $user->load($this->request->post());
+            if ($pass = $this->request->post('password')) {
+                $user->setPasswordPlain(trim($pass));
+            }
+            if ($user->isValid()) {
                 if ($this->findUserByEmail($user->getEmail())) {
-                    $errors['email'] = 'Email already exists';
+                    $user->addError('email', 'Email already exists');
                 } else {
+                    $user->setName($user->getEmail());
                     $this->getUserRepo()->save($user);
                     $this->webUser->login($user);
 
-                    return $this->redirectToRoute('/about');
+                    return $this->redirect($this->url('about/index'));
                 }
-            } else {
-                $errors = $user->getErrors();
             }
         }
 
-        return $this->render('auth/register', ['user' => $user, 'errors' => $errors]);
+        return $this->render('auth/register', ['user' => $user]);
     }
 
     public function logout(): RedirectResponse
     {
         $this->webUser->logout();
 
-        return $this->redirectToRoute('/about');
+        return $this->redirect($this->url('about/index'));
     }
 
     private function getUserRepo(): Repository

@@ -10,6 +10,7 @@ use Arc\Http\Response;
 use Arc\Security\WebUser;
 use Arc\View\View;
 use Arc\Router\Router;
+use Arc\Http\Session;
 
 class Controller
 {
@@ -20,6 +21,7 @@ class Controller
         protected WebUser $webUser,
         protected Config $config,
         protected Router $router,
+        protected Session $session,
     ) {
         $this->view->setLayout('layout');
     }
@@ -32,6 +34,11 @@ class Controller
     public function repository(string $modelClass): Repository
     {
         return $this->dbManager->getRepository($modelClass);
+    }
+
+    public function session(): Session
+    {
+        return $this->session;
     }
 
     public function before(): bool|Response

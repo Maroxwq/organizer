@@ -5,7 +5,7 @@
  */
 ?>
 <div class="text-center">
-    <a href="/notes/add" class="btn btn-primary btn-lg mb-3 mt-4">Добавить заметку</a>
+    <a href="<?= $this->url('notes/add')?>" class="btn btn-primary btn-lg mb-3 mt-4">Add note</a>
 </div>
 <?php if (!empty($message)): ?>
   <div class="alert alert-success" role="alert">
@@ -22,12 +22,8 @@
                 <p class="datechangedstr">Дата изменения: <?= $note->getDateChanged() ?></p>
                 <br>
                 <div class="d-flex justify-content-between">
-                    <form method="POST" action="/notes/delete/<?= $note->getId() ?>" class="forms">
-                        <button type="submit" class="btn btn-danger">Удалить</button>
-                    </form>
-                    <a href="/notes/edit/<?= $note->getId() ?>" class="btn btn-primary">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
+                    <a href="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>" class="btn btn-danger"><i class="bi bi-x-square-fill"></i></a>
+                    <a href="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
                 </div>
             </div>
         </a>

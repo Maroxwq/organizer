@@ -16,7 +16,7 @@ class NotesController extends Controller
 
         return $this->render('notes/index', [
             'notes' => $notes,
-            'message' => $this->view->session()->getFlash('success') ?: null,
+            'message' => $this->session()->getFlash('success') ?: null,
         ]);
     }
 
@@ -30,7 +30,7 @@ class NotesController extends Controller
 
     public function edit(int $id): Response|string
     {
-        $note = $this->noteRepository()->findOne($id);
+        $note = $this->requireNote($id);
 
         return $this->handleForm($note, 'edit');
     }
@@ -39,12 +39,12 @@ class NotesController extends Controller
     {
         $this->noteRepository()->delete($id);
 
-        return $this->redirectToRoute('/notes');
+        return $this->redirect($this->url('notes/index'));
     }
 
     public function viewNote(int $id): string
     {
-        $note = $this->noteRepository()->findOne($id);
+        $note = $this->requireNote($id);
         if ($note === null) {
             throw new \RuntimeException('Note not found for ID: ' . $id);
         }
@@ -54,19 +54,18 @@ class NotesController extends Controller
 
     private function handleForm(Note $note, string $templateName): Response|string
     {
-        $errors = [];
         if (
             $this->request->isPost() &&
             $note->load($this->request->post()) &&
             $note->isValid()
         ) {
             $this->noteRepository()->save($note);
-            $this->view->session()->setFlash('success', 'Note is successfully saved!');
+            $this->session()->setFlash('success', 'Note is successfully saved!');
 
-            return $this->redirect('/notes');
+            return $this->redirect($this->url('notes/index'));
         }
 
-        return $this->render('notes/' . $templateName, ['errors' => $errors, 'note' => $note]);
+        return $this->render('notes/' . $templateName, ['note' => $note]);
     }
 
     private function noteRepository(): NoteRepository
@@ -75,5 +74,15 @@ class NotesController extends Controller
         $repo = $this->repository(Note::class);
 
         return $repo;
+    }
+
+    private function requireNote(int $id): Note
+    {
+        $note = $this->noteRepository()->findOne($id);
+        if ($note === null) {
+            throw new \RuntimeException('Note not found for ID: ' . $id);
+        }
+
+        return $note;
     }
 }

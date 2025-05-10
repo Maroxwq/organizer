@@ -23,11 +23,6 @@ class View
         $this->layout = $layout;
     }
 
-    public function session(): Session
-    {
-        return $this->session;
-    }
-
     public function url(string $route, array $params = []): string
     {
         return $this->router->url($route, $params);

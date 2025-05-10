@@ -8,12 +8,8 @@
         <p>Цвет: <?= $note->getColor() ?></p>
         <p>Дата изменения: <?= $note->getDateChanged() ?></p> <br>
         <div class="d-flex justify-content-between">
-            <form method="POST" action="/notes/delete/<?= $note->getId() ?>" class="forms">
-                <input type="hidden" name="id" value="<?= $note->getId() ?>">
-                <button type="submit" class="btn btn-danger">Удалить</button>
-            </form>
-            <a href="/notes/edit/<?= $note->getId() ?>" class="btn btn-primary">Изменить</a>
-            </form>
+        <a href="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>" class="btn btn-danger"><i class="bi bi-x-square-fill"></i></a>
+        <a href="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
         </div>
     </div>
 </div>

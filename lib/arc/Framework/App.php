@@ -12,7 +12,13 @@ use Arc\Security\WebUser;
 
 class App
 {
-    public function __construct(private array $config) {}
+    public function __construct(private array $config) 
+    {
+        error_reporting(E_ALL);
+        set_error_handler(function ($severity, $message, $file, $line) {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
+    }
 
     public function run(): void
     {
@@ -21,14 +27,14 @@ class App
             $session = new Session();
             $router = new Router($config->routes());
             $request = Request::createFromGlobals();
-            $view = new View($config->basePath() . '/templates/', $session, $router, new WebUser($session, (new DbManager($config->db()))->getRepository($config->security()['user_class'])));
-            $dbManager  = new DbManager($config->db());
+            $dbManager = new DbManager($config->db());
             $webUser = new WebUser($session, $dbManager->getRepository($config->security()['user_class']));
+            $view = new View($config->basePath() . '/templates/', $session, $router, $webUser);
             $router->resolveRequest($request);
-            $controllerName  = ucfirst($request->attributes('_controller'));
+            $controllerName = ucfirst($request->attributes('_controller'));
             $controllerClass = $config->namespacePrefix() . 'Controller\\' . $controllerName . 'Controller';
             /** @var Controller $controller */
-            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config, $router);
+            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config, $router, $session);
             $before = $controller->before();
             if ($before instanceof Response) {
                 $before->send();
