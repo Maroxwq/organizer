@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>Auth</title>
+    <title><?= $title ?? 'Organizer' ?></title>
     <link href="/css/bootstrap.css" rel="stylesheet">
 </head>
 
