@@ -17,14 +17,10 @@ class AuthController extends Controller
         return parent::before();
     }
 
-
     public function login(): Response|string
     {
         $user = new User();
-        if (
-            $this->request->isPost()
-            && $user->load($this->request->post())
-        ) {
+        if ($this->request->isPost() && $user->load($this->request->post())) {
             $found = $this->findUserByEmail($user->getEmail());
             if ($found && $found->checkPassword($user->getPasswordPlain())) {
                 $this->webUser->login($found);
