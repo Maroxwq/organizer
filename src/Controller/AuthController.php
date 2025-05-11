@@ -21,20 +21,17 @@ class AuthController extends Controller
     public function login(): Response|string
     {
         $user = new User();
-        if ($this->request->isPost()) {
-            $user->load($this->request->post());
-            if ($pass = $this->request->post('password')) {
-                $user->setPasswordPlain(trim($pass));
-            }
-            if ($user->isValid()) {
-                $found = $this->findUserByEmail($user->getEmail());
-                if ($found && $found->checkPassword($user->getPasswordPlain())) {
-                    $this->webUser->login($found);
+        if (
+            $this->request->isPost()
+            && $user->load($this->request->post())
+        ) {
+            $found = $this->findUserByEmail($user->getEmail());
+            if ($found && $found->checkPassword($user->getPasswordPlain())) {
+                $this->webUser->login($found);
 
-                    return $this->redirect($this->url('about/index'));
-                }
-                $user->addError('email', 'Invalid email or password');
+                return $this->redirectToRoute('about/index');
             }
+            $user->addError('email', 'Invalid email or password');
         }
 
         return $this->render('auth/login', ['user' => $user]);
@@ -43,21 +40,16 @@ class AuthController extends Controller
     public function register(): Response|string
     {
         $user = new User();
-        if ($this->request->isPost()) {
-            $user->load($this->request->post());
-            if ($pass = $this->request->post('password')) {
-                $user->setPasswordPlain(trim($pass));
-            }
-            if ($user->isValid()) {
-                if ($this->findUserByEmail($user->getEmail())) {
-                    $user->addError('email', 'Email already exists');
-                } else {
-                    $user->setName($user->getEmail());
-                    $this->getUserRepo()->save($user);
-                    $this->webUser->login($user);
+        $repo = $this->getUserRepo();
+        if ($this->request->isPost() && $user->load($this->request->post()) && $user->isValid()) {
+            if ($repo->findOne(['email' => $user->getEmail()])) {
+                $user->addError('email', 'Email already exists');
+            } else {
+                $user->setName($user->getEmail());
+                $repo->save($user);
+                $this->webUser->login($user);
 
-                    return $this->redirect($this->url('about/index'));
-                }
+                return $this->redirectToRoute('about/index');
             }
         }
 
@@ -68,7 +60,7 @@ class AuthController extends Controller
     {
         $this->webUser->logout();
 
-        return $this->redirect($this->url('about/index'));
+        return $this->redirectToRoute('about/index');
     }
 
     private function getUserRepo(): Repository

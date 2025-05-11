@@ -2,7 +2,6 @@
 
 namespace Arc\View;
 
-use Arc\Http\Session;
 use Arc\Router\Router;
 use Arc\Security\WebUser;
 
@@ -13,7 +12,6 @@ class View
 
     public function __construct(
         private string $basePath,
-        private Session $session,
         private Router $router,
         private WebUser $webUser
     ) {}
@@ -56,7 +54,7 @@ class View
         $rendered = $this->renderPartial($templatePath, $params);
 
         if ($this->layout) {
-            return $this->renderPartial($this->layout, ['content' => $rendered]);
+            return $this->renderPartial($this->layout, array_merge($this->globalVars, ['content' => $rendered]));
         }
 
         return $rendered;

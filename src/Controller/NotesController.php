@@ -39,15 +39,12 @@ class NotesController extends Controller
     {
         $this->noteRepository()->delete($id);
 
-        return $this->redirect($this->url('notes/index'));
+        return $this->redirectToRoute('notes/index');
     }
 
     public function viewNote(int $id): string
     {
         $note = $this->requireNote($id);
-        if ($note === null) {
-            throw new \RuntimeException('Note not found for ID: ' . $id);
-        }
 
         return $this->render('notes/view', ['note' => $note]);
     }
@@ -62,10 +59,10 @@ class NotesController extends Controller
             $this->noteRepository()->save($note);
             $this->session()->setFlash('success', 'Note is successfully saved!');
 
-            return $this->redirect($this->url('notes/index'));
+            return $this->redirectToRoute('notes/index');
         }
 
-        return $this->render('notes/' . $templateName, ['note' => $note]);
+        return $this->render('notes/form', ['note' => $note, 'isEdit' => $templateName === 'edit']);
     }
 
     private function noteRepository(): NoteRepository

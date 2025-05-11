@@ -27,7 +27,9 @@ class User extends Model implements IdentityInterface
         return [
             ['email' => ['required' => true]],
             ['email' => ['string' => ['minLength' => 10, 'maxLength' => 50]]],
-            ['passwordPlain' => ['password' => ['minLength' => 6]]],
+            ['passwordPlain' => ['required' => true]],
+            ['passwordPlain' => ['string' => ['minLength' => 6]]],
+            // ['passwordPlain' => ['password' => ['minUpper' => 1, 'minDigits' => 2]]]
         ];
     }
 

@@ -29,7 +29,7 @@ class App
             $request = Request::createFromGlobals();
             $dbManager = new DbManager($config->db());
             $webUser = new WebUser($session, $dbManager->getRepository($config->security()['user_class']));
-            $view = new View($config->basePath() . '/templates/', $session, $router, $webUser);
+            $view = new View($config->basePath() . '/templates/', $router, $webUser);
             $router->resolveRequest($request);
             $controllerName = ucfirst($request->attributes('_controller'));
             $controllerClass = $config->namespacePrefix() . 'Controller\\' . $controllerName . 'Controller';

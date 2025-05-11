@@ -3,6 +3,7 @@
  * @var Org\Model\Note[] $notes
  * @var string|null $message
  */
+$this->setGlobalVar('title', 'Organizer - Notes');
 ?>
 <div class="text-center">
     <a href="<?= $this->url('notes/add')?>" class="btn btn-primary btn-lg mb-3 mt-4">Add note</a>

@@ -1,5 +1,6 @@
 <?php declare(strict_types = 1);
 /** @var Org\Model\Note $note */
+$this->setGlobalVar('title', 'Organizer - Note');
 ?>
 
 <div class="note w-50 card m-3 shadow rounded myowncard mx-auto" style="background-color: <?= $note->getColor() ?>;">

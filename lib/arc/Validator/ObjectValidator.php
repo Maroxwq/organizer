@@ -2,24 +2,30 @@
 
 namespace Arc\Validator;
 
-class ObjectValidator
-{
-    public function __construct(private ValidatorFactory $factory) {}
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-    public function validate(ValidatableInterface $obj): array
+class ObjectValidator implements ValidatorInterface
+{
+    private PropertyAccessorInterface $pa;
+
+    public function __construct(private ValidatorFactory $factory)
+    {
+        $this->pa = PropertyAccess::createPropertyAccessor();
+    }
+
+    public function validate(mixed $obj, array $options = []): array
     {
         $errors = [];
-        $factory = new ValidatorFactory();
         foreach ($obj->validationRules() as $ruleSet) {
             foreach ($ruleSet as $field => $validations) {
-                $getter = 'get' . ucfirst($field);
-                if (!method_exists($obj, $getter)) {
-                    throw new \RuntimeException("Getter {$getter} not found");
+                if (!$this->pa->isReadable($obj, $field)) {
+                    throw new \RuntimeException("Property {$field} is not readable");
                 }
-                $value = $obj->$getter();
+                $value = $this->pa->getValue($obj, $field);
                 foreach ($validations as $type => $options) {
-                    $validator = $factory->create($type);
-                    $result = $validator->validate($value, is_array($options) ? $options : []);
+                    $validator = $this->factory->create($type);
+                    $result = $validator->validate($value, is_array($options) ? $options : [$options]);
                     if ($result !== true) {
                         $obj->addError($field, array_shift($result));
                     }

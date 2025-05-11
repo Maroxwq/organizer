@@ -98,11 +98,6 @@ abstract class Model implements ValidatableInterface
         return !empty($this->errors);
     }
 
-    public function hasError(): bool
-    {
-        return !empty($this->errors);
-    }
-
     public function addError(string $field, string $message): static
     {
         $this->errors[$field] = $message;
