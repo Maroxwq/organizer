@@ -37,6 +37,7 @@ class NotesController extends Controller
 
     public function delete(int $id): Response
     {
+        $this->requireNote($id);
         $this->noteRepository()->delete($id);
 
         return $this->redirectToRoute('notes/index');

@@ -1,15 +1,12 @@
 <?php
 /** @var Org\Model\User $user */
-$errors = $user->getErrors();
 $this->setGlobalVar('title', 'Organizer - Login');
 ?>
 
 <form method="POST" action="/login">
     <h1 class="h3 mb-3 fw-normal text-center">Please sign in</h1>
-    <?php if (!empty($errors['email'])): ?>
-        <div class="alert alert-danger" role="alert">
-            <?= htmlspecialchars(is_array($errors['email']) ? $errors['email'][0] : $errors['email']) ?>
-        </div>
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     <div class="form-floating mb-3">
         <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com" value="<?= htmlspecialchars($user->getEmail()) ?>">

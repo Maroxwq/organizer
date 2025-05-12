@@ -9,4 +9,5 @@ interface ValidatableInterface
     public function getErrors(): array;
     public function getError(string $field): ?string;
     public function hasErrors(): bool;
+    public function hasError(string $field): bool;
 }

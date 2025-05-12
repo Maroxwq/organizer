@@ -11,21 +11,19 @@ class ObjectValidator implements ValidatorInterface
 
     public function __construct(private ValidatorFactory $factory)
     {
-        $this->pa = PropertyAccess::createPropertyAccessor();
+        $this->pa = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
     }
 
-    public function validate(mixed $obj, array $options = []): array
+    public function validate(mixed $obj, array $options = []): true|array
     {
-        $errors = [];
         foreach ($obj->validationRules() as $ruleSet) {
             foreach ($ruleSet as $field => $validations) {
-                if (!$this->pa->isReadable($obj, $field)) {
-                    throw new \RuntimeException("Property {$field} is not readable");
-                }
                 $value = $this->pa->getValue($obj, $field);
                 foreach ($validations as $type => $options) {
                     $validator = $this->factory->create($type);
-                    $result = $validator->validate($value, is_array($options) ? $options : [$options]);
+                    $result = $validator->validate($value, (array) $options);
                     if ($result !== true) {
                         $obj->addError($field, array_shift($result));
                     }
@@ -33,6 +31,6 @@ class ObjectValidator implements ValidatorInterface
             }
         }
 
-        return $errors;
+        return $obj->hasErrors() ? $obj->getErrors() : true;
     }
 }

@@ -20,17 +20,20 @@ class AuthController extends Controller
     public function login(): Response|string
     {
         $user = new User();
-        if ($this->request->isPost() && $user->load($this->request->post())) {
-            $found = $this->findUserByEmail($user->getEmail());
-            if ($found && $found->checkPassword($user->getPasswordPlain())) {
+        if ($this->request->isPost()) {
+            $email = trim($this->request->post('email'));
+            $password = trim($this->request->post('passwordPlain'));
+            $user->setEmail($email);
+            $found = $this->findUserByEmail($email);
+            if ($found && $found->checkPassword($password)) {
                 $this->webUser->login($found);
 
                 return $this->redirectToRoute('about/index');
             }
-            $user->addError('email', 'Invalid email or password');
+            $error = 'Invalid email or password';
         }
 
-        return $this->render('auth/login', ['user' => $user]);
+        return $this->render('auth/login', ['user' => $user, 'error' => $error ?? null]);
     }
 
     public function register(): Response|string

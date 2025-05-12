@@ -4,5 +4,5 @@ namespace Arc\Validator;
 
 interface ValidatorInterface
 {
-    public function validate(mixed $value, array $options = []): true | array;
+    public function validate(mixed $value, array $options = []): true|array;
 }

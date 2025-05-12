@@ -1,24 +1,23 @@
 <?php
 /** @var Org\Model\User $user */
-$errors = $user->getErrors();
 $this->setGlobalVar('title', 'Organizer - Register');
 ?>
 
 <form method="POST" action="/register">
     <h1 class="h3 mb-3 fw-normal text-center">Register</h1>
     <div class="form-floating mb-3">
-        <input name="email" type="email" class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>" id="floatingEmail" placeholder="name@example.com" value="<?= htmlspecialchars($user->getEmail()) ?>">
+        <input name="email" type="email" class="form-control <?= $user->hasError('email') ? ' is-invalid' : '' ?>" id="floatingEmail" placeholder="name@example.com" value="<?= htmlspecialchars($user->getEmail()) ?>">
         <label for="floatingEmail">Email address</label>
-        <?php if (!empty($errors['email'])): ?>
-            <div class="invalid-feedback"><?= htmlspecialchars(is_array($errors['email']) ? $errors['email'][0] : $errors['email']) ?></div>
+        <?php if ($user->hasError('email')): ?>
+            <div class="invalid-feedback"><?= htmlspecialchars($user->getError('email')) ?></div>
         <?php endif; ?>
     </div>
 
     <div class="form-floating mb-3">
-        <input name="passwordPlain" type="password" class="form-control <?= isset($errors['passwordPlain']) ? 'is-invalid' : '' ?>" id="floatingPassword" placeholder="Password">
+        <input name="passwordPlain" type="password" class="form-control <?= $user->hasError('passwordPlain') ? ' is-invalid' : '' ?>" id="floatingPassword" placeholder="Password">
         <label for="floatingPassword">Password</label>
-        <?php if (!empty($errors['passwordPlain'])): ?>
-            <div class="invalid-feedback"><?= htmlspecialchars(is_array($errors['passwordPlain']) ? $errors['passwordPlain'][0] : $errors['passwordPlain']) ?></div>
+        <?php if ($user->hasError('passwordPlain')): ?>
+            <div class="invalid-feedback"><?= htmlspecialchars($user->getError('passwordPlain')) ?></div>
         <?php endif; ?>
     </div>
 

@@ -19,8 +19,7 @@ $this->setGlobalVar('title', 'Organizer - Notes');
         <a href="/notes/<?= $note->getId() ?>" class="text-decoration-none text-dark">
             <div class="card-body">
                 <h1><?= htmlspecialchars($note->getContent()) ?></h1>
-                <p class="colorstr">Цвет: <?= $note->getColor() ?></p>
-                <p class="datechangedstr">Дата изменения: <?= $note->getDateChanged() ?></p>
+                <p class="datechangedstr">Change date: <?= $note->getDateChanged() ?></p>
                 <br>
                 <div class="d-flex justify-content-between">
                     <a href="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>" class="btn btn-danger"><i class="bi bi-x-square-fill"></i></a>
