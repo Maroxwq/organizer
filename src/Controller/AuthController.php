@@ -5,8 +5,6 @@ namespace Org\Controller;
 use Arc\Framework\Controller;
 use Arc\Http\RedirectResponse;
 use Arc\Http\Response;
-use Arc\Validator\ModelValidator;
-use Arc\Validator\PasswordValidator;
 use Org\Model\User;
 use Arc\Db\Repository;
 
@@ -19,63 +17,49 @@ class AuthController extends Controller
         return parent::before();
     }
 
-    public function login()
+    public function login(): Response|string
     {
-        $errors = [];
-        $email = '';
+        $user = new User();
         if ($this->request->isPost()) {
             $email = trim($this->request->post('email'));
-            $password = trim($this->request->post('password'));
-            $user = $this->findUserByEmail($email);
-            if (!$user) {
-                $errors[] = "User not found";
-            } elseif (!$user->checkPassword($password)) {
-                $errors[] = "Incorrect password";
-            } else {
-                $this->webUser->login($user);
+            $password = trim($this->request->post('passwordPlain'));
+            $user->setEmail($email);
+            $found = $this->findUserByEmail($email);
+            if ($found && $found->checkPassword($password)) {
+                $this->webUser->login($found);
 
-                return new RedirectResponse('/about');
+                return $this->redirectToRoute('about/index');
             }
+            $error = 'Invalid email or password';
         }
 
-        return $this->render('auth/login', ['errors' => $errors, 'email'  => $email]);
+        return $this->render('auth/login', ['user' => $user, 'error' => $error ?? null]);
     }
 
-    public function register()
+    public function register(): Response|string
     {
-        $errors = [];
-        $email = '';
-        if ($this->request->isPost()) {
-            $email = trim($this->request->post('email'));
-            $password = trim($this->request->post('password'));
-            $user = (new User())->setEmail($email)->setName($email);
-            $errors = (new ModelValidator())->validate($user);
-            if ($this->findUserByEmail($email)) {
-                $errors['email'][] = "Email already exists";
-            }
-            $passwordValidator = new PasswordValidator();
-            $passwordValidationResult = $passwordValidator->validate($password, ['minLength' => 6]);
-            if ($passwordValidationResult !== true) {
-                $errors['password'] = (array)$passwordValidationResult;
-            }
-            if (!empty($errors)) {
-                return $this->render('auth/register', ['errors' => $errors, 'email' => $email]);
-            }
-            $user->setPasswordPlain($password);
-            $this->getUserRepo()->save($user);
-            $this->webUser->login($user);
+        $user = new User();
+        $repo = $this->getUserRepo();
+        if ($this->request->isPost() && $user->load($this->request->post()) && $user->isValid()) {
+            if ($repo->findOne(['email' => $user->getEmail()])) {
+                $user->addError('email', 'Email already exists');
+            } else {
+                $user->setName($user->getEmail());
+                $repo->save($user);
+                $this->webUser->login($user);
 
-            return new RedirectResponse('/about');
+                return $this->redirectToRoute('about/index');
+            }
         }
 
-        return $this->render('auth/register', ['errors' => $errors, 'email' => $email,]);
+        return $this->render('auth/register', ['user' => $user]);
     }
 
     public function logout(): RedirectResponse
     {
         $this->webUser->logout();
 
-        return new RedirectResponse('/about');
+        return $this->redirectToRoute('about/index');
     }
 
     private function getUserRepo(): Repository

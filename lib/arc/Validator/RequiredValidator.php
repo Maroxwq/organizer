@@ -4,12 +4,18 @@ namespace Arc\Validator;
 
 class RequiredValidator implements ValidatorInterface
 {
-    public function validate(mixed $value, array $options = []): true | array
+    public function validate(mixed $value, array $options = []): true|array
     {
-        if (empty($value)) {
-            $errors = ['This field is required'];
+        if (isset($options['required']) && !$options['required']) {
+            return true;
         }
 
-        return $errors ?? true;
+        $message = $options['message'] ?? 'This field is required';
+
+        if (empty($value)) {
+            return [$message];
+        }
+
+        return true;
     }
 }

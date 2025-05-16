@@ -1,33 +1,41 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Arc\View;
 
-use Arc\Http\Session;
+use Arc\Router\Router;
+use Arc\Security\WebUser;
 
 class View
 {
-    private string $basePath;
     private ?string $layout;
-    private ?Session $session = null;
+    private array $globalVars = [];
 
-    public function __construct(string $basePath)
-    {
-        $this->basePath = $basePath;
-    }
+    public function __construct(
+        private string $basePath,
+        private Router $router,
+        private WebUser $webUser
+    ) {}
 
-    public function setLayout(?string $layout)
+    public function setLayout(?string $layout): void
     {
         $this->layout = $layout;
     }
 
-    public function setSession(Session $session): void
+    public function url(string $route, array $params = []): string
     {
-        $this->session = $session;
+        return $this->router->url($route, $params);
     }
 
-    public function session(): ?Session
+    public function webUser(): WebUser
     {
-        return $this->session;
+        return $this->webUser;
+    }
+
+    public function setGlobalVar(string $key, mixed $value): self
+    {
+        $this->globalVars[$key] = $value;
+
+        return $this;
     }
 
     public function renderPartial(string $templatePath, array $params = []): string
@@ -46,7 +54,7 @@ class View
         $rendered = $this->renderPartial($templatePath, $params);
 
         if ($this->layout) {
-            return $this->renderPartial($this->layout, ['content' => $rendered]);
+            return $this->renderPartial($this->layout, array_merge($this->globalVars, ['content' => $rendered]));
         }
 
         return $rendered;

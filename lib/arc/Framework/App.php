@@ -12,7 +12,13 @@ use Arc\Security\WebUser;
 
 class App
 {
-    public function __construct(private array $config) {}
+    public function __construct(private array $config) 
+    {
+        error_reporting(E_ALL);
+        set_error_handler(function ($severity, $message, $file, $line) {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        });
+    }
 
     public function run(): void
     {
@@ -21,30 +27,25 @@ class App
             $session = new Session();
             $router = new Router($config->routes());
             $request = Request::createFromGlobals();
-            $view = new View($config->basePath() . '/templates/');
-            $view->setSession($session);
             $dbManager = new DbManager($config->db());
-            $securityConfig = $config->security();
-            $userClass = $securityConfig['user_class'];
-            $userRepository = $dbManager->getRepository($userClass);
-            $webUser = new WebUser($session, $userRepository);
+            $webUser = new WebUser($session, $dbManager->getRepository($config->security()['user_class']));
+            $view = new View($config->basePath() . '/templates/', $router, $webUser);
             $router->resolveRequest($request);
             $controllerName = ucfirst($request->attributes('_controller'));
             $controllerClass = $config->namespacePrefix() . 'Controller\\' . $controllerName . 'Controller';
             /** @var Controller $controller */
-            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config);
-            $method = $request->attributes('_action');
-            $params = $request->attributes('_params');
-            $beforeResult = $controller->before();
-            if ($beforeResult instanceof Response) {
-                $beforeResult->send();
+            $controller = new $controllerClass($request, $view, $dbManager, $webUser, $config, $router, $session);
+            $before = $controller->before();
+            if ($before instanceof Response) {
+                $before->send();
 
                 return;
             }
-            $response = $controller->$method(...$params);
+            $response = $controller->{$request->attributes('_action')}( ...$request->attributes('_params') );
             if (is_string($response)) {
                 $response = new Response($response);
             }
+            
             $response->send();
         } catch (\Throwable $exception) {
             echo '<h1>' . $exception->getMessage() . '</h1>';
