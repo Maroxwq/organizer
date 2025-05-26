@@ -11,6 +11,7 @@ class Paginator
     {
         $this->totalItems = $query->count();
         $this->totalPages = (int) ceil($this->totalItems / $this->perPage);
+        $this->page = max(1, min($this->page, $this->totalPages ?: 1));
     }
 
     public function getCurrentPage(): int
@@ -46,5 +47,10 @@ class Paginator
     public function getItems(): array
     {
         return array_map([$this->modelClass, 'fromArray'], $this->query->limit($this->perPage)->offset(($this->page - 1) * $this->perPage)->all());
+    }
+
+    public function isPaginatable(): bool
+    {
+        return $this->totalPages > 1;
     }
 }

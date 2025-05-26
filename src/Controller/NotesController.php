@@ -15,7 +15,7 @@ class NotesController extends Controller
         $userId = $this->webUser->getIdentity()->getUserId();
         $page = (int) $this->request->query('page', 1);
         $perPage = 6;
-        $query = $this->repository(Note::class)->query()->where(['userId' => $userId]);
+        $query = $this->noteRepository()->query()->where(['userId' => $userId]);
         $paginator = new Paginator($query, Note::class, $page, $perPage);
 
         return $this->render('notes/index', [

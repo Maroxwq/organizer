@@ -2,6 +2,7 @@
 /**
  * @var Org\Model\Note[] $notes
  * @var string|null $message
+ * @var Arc\Db\Paginator $paginator
  */
 $this->setGlobalVar('title', 'Organizer - Notes');
 $notes = $paginator->getItems();
@@ -32,14 +33,16 @@ $notes = $paginator->getItems();
 <?php } ?>
 </div>
 
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        <li class="page-item<?= $paginator->getCurrentPage() === 1 ? ' disabled' : '' ?>"><a class="page-link" href="?page=1">First</a></li>
-        <li class="page-item<?= !$paginator->hasPrevious() ? ' disabled' : '' ?>"><a class="page-link" href="?page=<?= $paginator->getPreviousPage() ?>">&laquo;</a></li>
-        <?php for ($i = 1; $i <= $paginator->getPagesTotal(); $i++): ?>
-            <li class="page-item<?= $i === $paginator->getCurrentPage() ? ' active' : '' ?>"><a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a></li>
-        <?php endfor; ?>
-        <li class="page-item<?= !$paginator->hasNext() ? ' disabled' : '' ?>"><a class="page-link" href="?page=<?= $paginator->getNextPage() ?>">&raquo;</a></li>
-        <li class="page-item<?= $paginator->getCurrentPage() === $paginator->getPagesTotal() ? ' disabled' : '' ?>"><a class="page-link" href="?page=<?= $paginator->getPagesTotal() ?>">Last</a></li>
-    </ul>
-</nav>
+<?php if ($paginator->isPaginatable()): ?>
+    <nav aria-label="Notes pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item<?= $paginator->getCurrentPage() === 1 ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => 1]) ?>">First</a></li>
+            <li class="page-item<?= !$paginator->hasPrevious() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getPreviousPage()]) ?>">&laquo;</a></li>
+            <?php for ($i = 1; $i <= $paginator->getPagesTotal(); $i++): ?>
+                <li class="page-item<?= $i === $paginator->getCurrentPage() ? ' active' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $i]) ?>"><?= $i ?></a></li>
+            <?php endfor; ?>
+            <li class="page-item<?= !$paginator->hasNext() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getNextPage()]) ?>">&raquo;</a></li>
+            <li class="page-item<?= $paginator->getCurrentPage() === $paginator->getPagesTotal() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getPagesTotal()]) ?>">Last</a></li>
+        </ul>
+    </nav>
+<?php endif; ?>

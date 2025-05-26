@@ -50,7 +50,14 @@ class Router
 
         $url = $pattern;
         foreach ($params as $key => $value) {
-            $url = preg_replace('/:' . preg_quote($key, '/') . '\\b/', (string) $value, $url);
+            if (str_contains($url, ':' . $key)) {
+                $url = preg_replace('/:' . preg_quote($key, '/') . '\\b/', (string) $value, $url);
+                unset($params[$key]);
+            }
+        }
+
+        if (!empty($params)) {
+            $url .= '?' . http_build_query($params);
         }
 
         return $url;
