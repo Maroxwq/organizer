@@ -11,13 +11,13 @@ class Request
         private array $attributes = []
     ) {}
 
-    public function query(?string $key = null): string|array|null
+    public function query(?string $key = null, mixed $default = null): mixed
     {
         if ($key === null) {
             return $this->query;
         }
 
-        return $this->query[$key] ?? null; 
+        return $this->query[$key] ?? $default; 
     }
 
     public function post(?string $key = null): string|array|null

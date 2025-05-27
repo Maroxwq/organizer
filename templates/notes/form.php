@@ -1,19 +1,15 @@
 <?php
 /** @var Org\Model\Note $note */
-/** @var bool $isEdit */
-$this->setGlobalVar('title', 'Organizer – ' . ($isEdit ? 'Edit' : 'Add') . ' Note');
-$actionUrl = $isEdit ? $this->url('notes/edit', ['id' => $note->getId()]) : $this->url('notes/add');
+$this->setGlobalVar('title', 'Organizer – ' . ($note->isNew() ? 'Add' : 'Edit') . ' Note');
+$actionUrl = $note->isNew() ? $this->url('notes/add') : $this->url('notes/edit', ['id' => $note->getId()]);
 ?>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 100px);">
     <div class="card shadow-lg p-4 rounded" style="width: 400px;">
-        <h2 class="text-center mb-4"><?= $isEdit ? 'Edit' : 'Add' ?> Note</h2>
+        <h2 class="text-center mb-4"><?= $note->isNew() ? 'Add' : 'Edit' ?> Note</h2>
         <form method="POST" action="<?= $actionUrl ?>">
             <div class="form-floating mb-3">
-                <?= $isEdit ? '<textarea class="form-control' . ($note->hasError('content') ? ' is-invalid' : '') . '" id="content" name="content" placeholder="Your text" style="height: 100px;">'
-                . htmlspecialchars($note->getContent()) . '</textarea>' 
-                : '<input type="text" class="form-control' . ($note->hasError('content') ? ' is-invalid' : '') . '" id="content" name="content" value="'
-                . htmlspecialchars($note->getContent()) . '" placeholder="Your text">' ?>
+                <input type="text" class="form-control<?= $note->hasError('content') ? ' is-invalid' : '' ?>" id="content" name="content" value="<?= htmlspecialchars($note->getContent()) ?>" placeholder="Your text">
                 <label for="content">Content</label>
                 <?php if ($note->hasError('content')): ?>
                     <div class="invalid-feedback"><?= htmlspecialchars($note->getError('content')) ?></div>

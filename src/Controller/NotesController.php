@@ -6,16 +6,20 @@ use Arc\Framework\Controller;
 use Arc\Http\Response;
 use Org\Repository\NoteRepository;
 use Org\Model\Note;
+use Arc\Db\Paginator;
 
 class NotesController extends Controller
 {
     public function index(): string
     {
         $userId = $this->webUser->getIdentity()->getUserId();
-        $notes  = $this->repository(Note::class)->findBy(['userId' => $userId]);
+        $page = (int) $this->request->query('page', 1);
+        $perPage = 6;
+        $query = $this->noteRepository()->query()->where(['userId' => $userId]);
+        $paginator = new Paginator($query, Note::class, $page, $perPage);
 
         return $this->render('notes/index', [
-            'notes' => $notes,
+            'paginator' => $paginator,
             'message' => $this->session()->getFlash('success') ?: null,
         ]);
     }
@@ -63,7 +67,7 @@ class NotesController extends Controller
             return $this->redirectToRoute('notes/index');
         }
 
-        return $this->render('notes/form', ['note' => $note, 'isEdit' => $templateName === 'edit']);
+        return $this->render('notes/form', ['note' => $note]);
     }
 
     private function noteRepository(): NoteRepository

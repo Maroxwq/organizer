@@ -2,8 +2,10 @@
 /**
  * @var Org\Model\Note[] $notes
  * @var string|null $message
+ * @var Arc\Db\Paginator $paginator
  */
 $this->setGlobalVar('title', 'Organizer - Notes');
+$notes = $paginator->getItems();
 ?>
 <div class="text-center">
     <a href="<?= $this->url('notes/add')?>" class="btn btn-primary btn-lg mb-3 mt-4">Add note</a>
@@ -30,3 +32,17 @@ $this->setGlobalVar('title', 'Organizer - Notes');
     </div>
 <?php } ?>
 </div>
+
+<?php if ($paginator->isPaginatable()): ?>
+    <nav aria-label="Notes pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item<?= $paginator->getCurrentPage() === 1 ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => 1]) ?>">First</a></li>
+            <li class="page-item<?= !$paginator->hasPrevious() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getPreviousPage()]) ?>">&laquo;</a></li>
+            <?php for ($i = 1; $i <= $paginator->getPagesTotal(); $i++): ?>
+                <li class="page-item<?= $i === $paginator->getCurrentPage() ? ' active' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $i]) ?>"><?= $i ?></a></li>
+            <?php endfor; ?>
+            <li class="page-item<?= !$paginator->hasNext() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getNextPage()]) ?>">&raquo;</a></li>
+            <li class="page-item<?= $paginator->getCurrentPage() === $paginator->getPagesTotal() ? ' disabled' : '' ?>"><a class="page-link" href="<?= $this->url('notes/index', ['page' => $paginator->getPagesTotal()]) ?>">Last</a></li>
+        </ul>
+    </nav>
+<?php endif; ?>
