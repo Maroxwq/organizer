@@ -15,7 +15,7 @@
 
             <div class="d-flex gap-3">
                 <a href="<?= $this->url('about/index') ?>" class="nav-link active pb-0 fs-5">About</a>
-                <a href="<?= $this->url('notes/index') . "?page=1" ?>" class="nav-link active pb-0 fs-5">Notes</a>
+                <a href="<?= $this->url('notes/index') ?>" class="nav-link active pb-0 fs-5">Notes</a>
                 <a href="<?= $this->url('posts/index') ?>" class="nav-link active pb-0 fs-5">Forum</a>
             </div>
 

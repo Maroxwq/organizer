@@ -11,7 +11,7 @@ class Paginator
     {
         $this->totalItems = $query->count();
         $this->totalPages = (int) ceil($this->totalItems / $this->perPage);
-        $this->page = max(1, min($this->page, $this->totalPages ?: 1));
+        $this->page = max(1, min($this->page, $this->totalPages));
     }
 
     public function getCurrentPage(): int
