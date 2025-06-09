@@ -7,13 +7,13 @@
 $this->setGlobalVar('title', 'Organizer - Notes');
 $notes = $paginator->getItems();
 ?>
-<div class="text-center mb-3 mt-4"><button id="add-note-btn" type="button" class="btn btn-primary btn-lg">Add note</button></div>
+<div class="text-center mb-3 mt-4"><button id="add_note_btn" type="button" class="btn btn-primary btn-lg" data-url="<?= $this->url('notes/add') ?>">Add note</button></div>
 <?php if (!empty($message)): ?>
   <div class="alert alert-success" role="alert">
     <?= htmlspecialchars($message) ?>
   </div>
 <?php endif; ?>
-<div id="notes-container" class="container d-flex flex-wrap" style="justify-content: space-around;">
+<div id="notes_container" class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
     <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">
         <a href="/notes/<?= $note->getId() ?>" class="text-decoration-none text-dark">
@@ -45,67 +45,13 @@ $notes = $paginator->getItems();
 <?php endif; ?>
 
 <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Note</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body"></div>
     </div>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const modalEl = document.getElementById('noteModal');
-  const bsModal = new bootstrap.Modal(modalEl);
-  const body = modalEl.querySelector('.modal-body');
-  async function loadForm(url) {
-    const res = await fetch(url);
-    const html = await res.text();
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    const form = tmp.querySelector('form');
-    body.innerHTML = '';
-    body.appendChild(form);
-    bsModal.show();
-    bindFormSubmit(form);
-  }
-  function bindFormSubmit(form) {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form)
-      });
-      const html = await res.text();
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html;
-      const newForm = tmp.querySelector('form');
-      if (newForm) {
-        body.innerHTML = '';
-        body.appendChild(newForm);
-        bindFormSubmit(newForm);
-      } else {
-        bsModal.hide();
-        window.location.reload();
-      }
-    });
-  }
-  document.getElementById('add-note-btn').addEventListener('click', () => loadForm('<?= $this->url('notes/add') ?>'));
-  document.getElementById('notes-container').addEventListener('click', e => {
-      const btn = e.target.closest('.edit-note-btn');
-      if (!btn) return;
-      loadForm(btn.getAttribute('data-url'));
-    });
-    document.getElementById('notes-container').addEventListener('click', async e => {
-    const btn = e.target.closest('.delete-note-btn');
-    if (!btn) return;
-    if (!confirm('Удалить заметку?')) return;
-    await fetch(btn.getAttribute('data-url'), { method: 'POST' });
-    const card = btn.closest('.note');
-    card?.remove();
-  });
-});
-</script>
