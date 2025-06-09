@@ -7,28 +7,25 @@
 $this->setGlobalVar('title', 'Organizer - Notes');
 $notes = $paginator->getItems();
 ?>
-<div class="text-center">
-    <a href="<?= $this->url('notes/add')?>" class="btn btn-primary btn-lg mb-3 mt-4">Add note</a>
-</div>
+<div class="text-center mb-3 mt-4"><button id="add_note_btn" type="button" class="btn btn-primary btn-lg" data-url="<?= $this->url('notes/add') ?>">Add note</button></div>
 <?php if (!empty($message)): ?>
   <div class="alert alert-success" role="alert">
     <?= htmlspecialchars($message) ?>
   </div>
 <?php endif; ?>
-<div class="container d-flex flex-wrap" style="justify-content: space-around;">
+<div id="notes_container" class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
     <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">
         <a href="/notes/<?= $note->getId() ?>" class="text-decoration-none text-dark">
             <div class="card-body">
                 <h1><?= htmlspecialchars($note->getContent()) ?></h1>
                 <p class="datechangedstr">Change date: <?= $note->getDateChanged() ?></p>
-                <br>
-                <div class="d-flex justify-content-between">
-                    <a href="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>" class="btn btn-danger"><i class="bi bi-x-square-fill"></i></a>
-                    <a href="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
-                </div>
             </div>
         </a>
+        <div class="p-3 d-flex">
+            <button type="button" class="btn btn-danger delete-note-btn" data-url="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>"><i class="bi bi-x-square-fill"></i></button>
+            <button type="button" data-url="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" class="btn btn-primary edit-note-btn"><i class="bi bi-pencil-square"></i></button>
+        </div>
     </div>
 <?php } ?>
 </div>
@@ -46,3 +43,15 @@ $notes = $paginator->getItems();
         </ul>
     </nav>
 <?php endif; ?>
+
+<div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </div>
+</div>
