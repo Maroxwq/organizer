@@ -50,12 +50,15 @@ class NotesController extends Controller
     public function viewNote(int $id): string
     {
         $note = $this->requireNote($id);
+        $this->view->setLayout(null);
 
         return $this->render('notes/view', ['note' => $note]);
     }
 
     private function handleForm(Note $note, string $templateName): Response|string
     {
+        $this->view->setLayout(null);
+
         if (
             $this->request->isPost() &&
             $note->load($this->request->post()) &&
@@ -64,10 +67,15 @@ class NotesController extends Controller
             $this->noteRepository()->save($note);
             $this->session()->setFlash('success', 'Note is successfully saved!');
 
-            return $this->redirectToRoute('notes/index');
+            return new Response();
         }
 
-        return $this->render('notes/form', ['note' => $note]);
+        $response = new Response($this->render('notes/form', ['note' => $note]));
+        if ($this->request->isPost()) {
+            $response->setStatusCode(422);
+        }
+
+        return $response;
     }
 
     private function noteRepository(): NoteRepository

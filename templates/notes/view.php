@@ -9,9 +9,6 @@ $this->setGlobalVar('title', 'Organizer - Note');
         <p>Color: <?= $note->getColor() ?></p>
         <p>Change date: <?= $note->getDateChanged() ?></p> <br>
         <div class="d-flex justify-content-between">
-        <a href="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>" class="btn btn-danger"><i class="bi bi-x-square-fill"></i></a>
-        <a href="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
         </div>
     </div>
 </div>
-
