@@ -55,7 +55,7 @@ class AjaxModalForm extends AjaxModal {
     }
 }
 
-class AjaxDelete {
+class AjaxAction {
     constructor(activator) {
         this.activator = activator;
         this.addListeners();
@@ -64,11 +64,12 @@ class AjaxDelete {
     addListeners() {
         this.activator.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!confirm('Delete this note?')) return;
+            const msg = this.activator.dataset.confirmMessage;
+            if (msg ? !confirm(msg) : false) return;
             const url = this.activator.dataset.url;
             const response = await fetch(url, { method: 'POST' });
             if (response.status === 200) {
-                this.activator.closest('.note')?.remove();
+                window.location.reload();
             } else {
                 alert('Failed to delete.');
             }

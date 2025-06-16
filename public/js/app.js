@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         new AjaxModalForm(activator, bsModal);
     });
 
-    document.querySelectorAll('.ajax-delete').forEach(activator => {
-        new AjaxDelete(activator);
+    document.querySelectorAll('.ajax-action').forEach(activator => {
+        new AjaxAction(activator);
     });
 });

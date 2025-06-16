@@ -23,8 +23,8 @@ $notes = $paginator->getItems();
             </div>
         </a>
         <div class="p-3 d-flex">
-            <button type="button" class="btn btn-danger delete-note-btn ajax-action ajax-delete" data-url="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>"><i class="bi bi-x-square-fill"></i></button>
-            <button type="button" data-url="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" data-title="Edit" class="btn btn-primary edit-note-btn ajax-modal-form"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="btn btn-danger ajax-action" data-confirm-message="Delete this note?" data-url="<?= $this->url('notes/delete', ['id' => $note->getId()]) ?>"><i class="bi bi-x-square-fill"></i></button>
+            <button type="button" data-url="<?= $this->url('notes/edit', ['id' => $note->getId()]) ?>" data-title="Edit" class="btn btn-primary ajax-modal-form"><i class="bi bi-pencil-square"></i></button>
         </div>
     </div>
 <?php } ?>
