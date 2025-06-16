@@ -20,4 +20,3 @@ $actionUrl = $note->isNew() ? $this->url('notes/add') : $this->url('notes/edit',
     </div>
     <button type="submit" class="btn btn-primary w-100">Save</button>
 </form>
-

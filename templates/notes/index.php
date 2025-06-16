@@ -7,13 +7,13 @@
 $this->setGlobalVar('title', 'Organizer - Notes');
 $notes = $paginator->getItems();
 ?>
-<div class="text-center mb-3 mt-4"><button id="add_note_btn" type="button" class="btn btn-primary btn-lg ajax-modal-form" data-url="<?= $this->url('notes/add') ?>" data-title="Add">Add note</button></div>
+<div class="text-center mb-3 mt-4"><button type="button" class="btn btn-primary btn-lg ajax-modal-form" data-url="<?= $this->url('notes/add') ?>" data-title="Add">Add note</button></div>
 <?php if (!empty($message)): ?>
   <div class="alert alert-success" role="alert">
     <?= htmlspecialchars($message) ?>
   </div>
 <?php endif; ?>
-<div id="notes_container" class="container d-flex flex-wrap" style="justify-content: space-around;">
+<div class="container d-flex flex-wrap" style="justify-content: space-around;">
 <?php foreach ($notes as $note) { ?>
     <div class="note w-25 card m-3 shadow rounded myowncard" style="background-color: <?= $note->getColor() ?>;">
         <a href="/notes/<?= $note->getId() ?>" class="text-decoration-none text-dark ajax-modal" data-url="<?= $this->url('notes/viewNote', ['id' => $note->getId()]) ?>">

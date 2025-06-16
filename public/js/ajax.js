@@ -10,6 +10,7 @@ class AjaxModal {
             e.preventDefault();
             const url = this.activator.dataset.url;
             const response = await fetch(url);
+            if (response.status !== 200) return;
             const html = await response.text();
             this.showModal(html);
         });
@@ -17,46 +18,40 @@ class AjaxModal {
 
     showModal(content) {
         const body = this.modal._element.querySelector('.modal-body');
-        const tmp = document.createElement('div');
-        tmp.innerHTML = content;
+        body.innerHTML = content;
         this.modal._element.querySelector('.modal-title').textContent = this.activator.dataset.title || '';
-        const form = tmp.querySelector('form');
-        if (form) {
-            body.innerHTML = '';
-            body.appendChild(form);
-        } else {
-            body.innerHTML = content;
-        }
         this.modal.show();
     }
 }
 
 class AjaxModalForm extends AjaxModal {
-    addSubmitListener(form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const res = await fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            const html = await res.text();
-            const tmp = document.createElement('div');
-            tmp.innerHTML = html;
-            const newForm = tmp.querySelector('form');
-            if (newForm) {
-                this.showModal(html);
-            } else {
-                this.modal.hide();
-                window.location.reload();
-            }
-        }, { once: true });
-    }
-
     showModal(content) {
         super.showModal(content);
+        this.bindForm();
+    }
+
+    bindForm() {
         const form = this.modal._element.querySelector('form');
-        if (form) this.addSubmitListener(form);
+        if (!form) return;
+        form.addEventListener('submit', this.submitForm.bind(this));
+    }
+
+    async submitForm(e) {
+        e.preventDefault();
+        const form = e.target;
+        const action = form.action;
+        const data = new FormData(form);
+        const response = await fetch(action, {
+            method: 'POST',
+            body: data
+        });
+        const html = await response.text();
+        if (response.status === 422) {
+            this.showModal(html);
+        } else if (response.status === 200) {
+            this.modal.hide();
+            window.location.reload();
+        }
     }
 }
 
@@ -69,10 +64,10 @@ class AjaxDelete {
     addListeners() {
         this.activator.addEventListener('click', async (e) => {
             e.preventDefault();
-            const url = this.activator.dataset.url;
             if (!confirm('Delete this note?')) return;
+            const url = this.activator.dataset.url;
             const response = await fetch(url, { method: 'POST' });
-            if (response.ok) {
+            if (response.status === 200) {
                 this.activator.closest('.note')?.remove();
             } else {
                 alert('Failed to delete.');
